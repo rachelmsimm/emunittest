@@ -619,7 +619,10 @@ function doReferenceTest() {
   if (typeof GLctx !== 'undefined') canvas = GLctx.canvas;
   else if (Module.ctx) canvas = Module.ctx.canvas;
   else if (Module['canvas']) canvas = Module['canvas'];
-  else throw 'Cannot find application canvas!';
+  else {
+    canvas = document.querySelector('canvas');
+    if (!canvas) throw 'Cannot find application canvas!';
+  }
 
   // Grab rendered WebGL front buffer image to a JS-side image object.
   var actualImage = new Image();
@@ -748,6 +751,7 @@ function doReferenceTest() {
       window.close();
     } else {
       console.log('no window.opener, not closing test window after ref finished (close it manually)');
+      enablePageScrolling();
     }
   }
 
@@ -769,10 +773,11 @@ function doReferenceTest() {
 // x and y: Normalized coordinate in the range [0,1] where to inject the event.
 // button: which button was clicked. 0 = mouse left button. If eventType="mousemove", pass 0.
 function simulateMouseEvent(eventType, x, y, button) {
+  var canvas = Module['canvas'] || document.querySelector('canvas');
   // Remap from [0,1] to canvas CSS pixel size.
-  x *= Module['canvas'].clientWidth;
-  y *= Module['canvas'].clientHeight;
-  var rect = Module['canvas'].getBoundingClientRect();
+  x *= canvas.clientWidth;
+  y *= canvas.clientHeight;
+  var rect = canvas.getBoundingClientRect();
   // Offset the injected coordinate from top-left of the client area to the top-left of the canvas.
   x = Math.round(rect.left + x);
   y = Math.round(rect.top + y);
@@ -786,7 +791,7 @@ function simulateMouseEvent(eventType, x, y, button) {
   // Dispatch to Emscripten's html5.h API:
   if (Module['usesEmscriptenHTML5InputAPI'] && typeof JSEvents !== 'undefined' && JSEvents.eventHandlers && JSEvents.eventHandlers.length > 0) {
     for(var i = 0; i < JSEvents.eventHandlers.length; ++i) {
-      if ((JSEvents.eventHandlers[i].target == Module['canvas'] || JSEvents.eventHandlers[i].target == window)
+      if ((JSEvents.eventHandlers[i].target == canvas || JSEvents.eventHandlers[i].target == window)
        && JSEvents.eventHandlers[i].eventTypeString == eventType) {
          JSEvents.eventHandlers[i].handlerFunc(e);
       }
@@ -795,8 +800,8 @@ function simulateMouseEvent(eventType, x, y, button) {
     // Programmatically reating DOM events doesn't allow specifying offsetX & offsetY properly
     // for the element, but they must be the same as clientX & clientY. Therefore we can't have a
     // border that would make these different.
-    if (Module['canvas'].clientWidth != Module['canvas'].offsetWidth
-      || Module['canvas'].clientHeight != Module['canvas'].offsetHeight) {
+    if (canvas.clientWidth != canvas.offsetWidth
+      || canvas.clientHeight != canvas.offsetHeight) {
       throw "ERROR! Canvas object must have 0px border for direct mouse dispatch to work!";
     }
     for(var i = 0; i < registeredEventListeners.length; ++i) {
@@ -861,20 +866,22 @@ function simulateMouseEvent(eventType, x, y, button) {
     }
   } else {
     // Dispatch directly to browser
-    Module['canvas'].dispatchEvent(e);
+    canvas.dispatchEvent(e);
   }
 }
 
 function simulateWheelEvent(eventType, deltaX, deltaY, deltaZ, deltaMode) {
+  var canvas = Module['canvas'] || document.querySelector('canvas');
   var e = new Event('wheel');
   e.deltaX = deltaX;
   e.deltaY = deltaY;
   e.deltaZ = deltaZ;
   e.deltaMode = deltaMode;
-  Module['canvas'].dispatchEvent(e);
+  canvas.dispatchEvent(e);
 }
 
 function simulateKeyEvent(eventType, keyCode, charCode) {
+  var canvas = Module['canvas'] || document.querySelector('canvas');
   // Don't use the KeyboardEvent object because of http://stackoverflow.com/questions/8942678/keyboardevent-in-chrome-keycode-is-0/12522752#12522752
   // See also http://output.jsbin.com/awenaq/3
   //    var e = document.createEvent('KeyboardEvent');
@@ -896,7 +903,7 @@ function simulateKeyEvent(eventType, keyCode, charCode) {
   // Dispatch directly to Emscripten's html5.h API:
   if (Module['usesEmscriptenHTML5InputAPI'] && typeof JSEvents !== 'undefined' && JSEvents.eventHandlers && JSEvents.eventHandlers.length > 0) {
     for(var i = 0; i < JSEvents.eventHandlers.length; ++i) {
-      if ((JSEvents.eventHandlers[i].target == Module['canvas'] || JSEvents.eventHandlers[i].target == window)
+      if ((JSEvents.eventHandlers[i].target == canvas || JSEvents.eventHandlers[i].target == window)
        && JSEvents.eventHandlers[i].eventTypeString == eventType) {
          JSEvents.eventHandlers[i].handlerFunc(e);
       }
@@ -910,7 +917,7 @@ function simulateKeyEvent(eventType, keyCode, charCode) {
     }
   } else {
     // Dispatch to browser for real
-    Module['canvas'].dispatchEvent ? Module['canvas'].dispatchEvent(e) : Module['canvas'].fireEvent("on" + eventType, e);
+    canvas.dispatchEvent ? canvas.dispatchEvent(e) : canvas.fireEvent("on" + eventType, e);
   }
 }
 
@@ -962,7 +969,7 @@ if (injectingInputStream) {
   if (typeof EventTarget !== 'undefined') {
     replaceEventListener(EventTarget.prototype, null);
   } else {
-    var eventListenerObjectsToReplace = [window, document, document.body, Module['canvas']];
+    var eventListenerObjectsToReplace = [window, document, document.body, Module['canvas'] || document.querySelector('canvas')];
     if (Module['extraDomElementsWithEventListeners']) eventListenerObjectsToReplace = eventListenerObjectsToReplace.concat(Module['extraDomElementsWithEventListeners']);
     for(var i = 0; i < eventListenerObjectsToReplace.length; ++i) {
       replaceEventListener(eventListenerObjectsToReplace[i], eventListenerObjectsToReplace[i]);
@@ -991,13 +998,24 @@ Module['referenceTestPreTick'] = referenceTestPreTick;
 // Captures the whole input stream as a JavaScript formatted code.
 var recordedInputStream = 'function injectInputStream(referenceTestFrameNumber) { <br>';
 
+function enablePageScrolling() {
+  // It is common to set 'overflow: hidden;' on canvas pages that do WebGL. When CpuProfiler is being used, there will be a long block of text on the page, so force-enable scrolling.
+  document.body.style.overflow = '';
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.appendChild(document.createTextNode("body {overflow: visible !important;}"));
+  document.head.appendChild(style);
+}
+
 function dumpRecordedInputStream() {  
   recordedInputStream += '}<br>';
 
   var div = document.createElement('div');
   div.innerHTML = '<pre>'+recordedInputStream+'</pre>';
   document.body.appendChild(div);
-  Module['canvas'].style = 'display: none';
+  (Module['canvas']||document.querySelector('canvas')).style = 'display: none';
+
+  enablePageScrolling();
 }
 
 function rampFloat(x0, y0, x1, y1, val) {
@@ -1156,34 +1174,38 @@ Module['onRuntimeInitialized'] = function() {
 
 // Maps mouse coordinate from canvas CSS pixels to normalized [0,1] range. In y coordinate y grows downwards.
 function computeNormalizedCanvasPos(e) {
-  var rect = Module['canvas'].getBoundingClientRect();
+  var canvas = Module['canvas'] || document.querySelector('canvas');
+  var rect = canvas.getBoundingClientRect();
   var x = e.clientX - rect.left;
   var y = e.clientY - rect.top;
-  var clientWidth = Module['canvas'].clientWidth;
-  var clientHeight = Module['canvas'].clientHeight;
+  var clientWidth = canvas.clientWidth;
+  var clientHeight = canvas.clientHeight;
   x /= clientWidth;
   y /= clientHeight;
   return [x, y];
 }
 
-// Inject mouse and keyboard capture event handlers to record input stream.
-if (recordingInputStream) {
-  Module['canvas'].addEventListener("mousedown", function(e) {
+function captureInputHandlers() {
+  var c = Module['canvas'] || document.querySelector('canvas');
+  if (!c) {
+    return (typeof realSetTimeout !== 'undefined'?realSetTimeout:setTimeout)(captureInputHandlers, 0);
+  }
+  c.addEventListener("mousedown", function(e) {
     var pos = computeNormalizedCanvasPos(e);
     recordedInputStream += 'if (referenceTestFrameNumber == ' + referenceTestFrameNumber + ') simulateMouseEvent("mousedown", '+ pos[0] + ', ' + pos[1] + ', 0);<br>';
     });
 
-  Module['canvas'].addEventListener("mouseup", function(e) {
+  c.addEventListener("mouseup", function(e) {
     var pos = computeNormalizedCanvasPos(e);
     recordedInputStream += 'if (referenceTestFrameNumber == ' + referenceTestFrameNumber + ') simulateMouseEvent("mouseup", '+ pos[0] + ', ' + pos[1] + ', 0);<br>';
     });
 
-  Module['canvas'].addEventListener("mousemove", function(e) {
+  c.addEventListener("mousemove", function(e) {
     var pos = computeNormalizedCanvasPos(e);
     recordedInputStream += 'if (referenceTestFrameNumber == ' + referenceTestFrameNumber + ') simulateMouseEvent("mousemove", '+ pos[0] + ', ' + pos[1] + ', 0);<br>';
     });
 
-  Module['canvas'].addEventListener("wheel", function(e) {
+  c.addEventListener("wheel", function(e) {
     recordedInputStream += 'if (referenceTestFrameNumber == ' + referenceTestFrameNumber + ') simulateWheelEvent("wheel", '+ e.deltaX + ', ' + e.deltaY + ', ' + e.deltaZ + ', ' + e.deltaMode + ');<br>';
     });
 
@@ -1194,7 +1216,11 @@ if (recordingInputStream) {
   window.addEventListener("keyup", function(e) {
     recordedInputStream += 'if (referenceTestFrameNumber == ' + referenceTestFrameNumber + ') simulateKeyEvent("keyup", ' + e.keyCode + ', ' + e.charCode + ');<br>';
     });
+}
 
+// Inject mouse and keyboard capture event handlers to record input stream.
+if (recordingInputStream) {
+  captureInputHandlers();
 }
 
 // Hide a few Emscripten-specific page elements from the default shell to remove unwanted interactivity options.
@@ -1215,6 +1241,10 @@ function noOpWebGL(glCtx) {
       if (Module['canvas'] && Module['canvas'].GLctxObject && Module['canvas'].GLctxObject.GLctx) return Module['canvas'].GLctxObject.GLctx;
       else if (typeof GLctx !== 'undefined') return GLctx;
       else if (Module.ctx) return Module.ctx;
+      else {
+        var canvas = document.querySelector('canvas');
+        if (canvas && canvas.GLctxObject && canvas.GLctxObject.GLctx) return canvas.GLctxObject.GLctx;
+      }
       return null;
     })();
   }
