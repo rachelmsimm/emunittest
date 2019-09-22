@@ -76,9 +76,14 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
 
   var tests = [
 
-    { name: "10kCubes", key: '10kcubes', url: "2015-08-27-10kCubes/10kCubes.html?/objects&10000", size: 783597, heap: 64*1024*1024, compiler: 'e1.34.6', engine: 'gfxapi', date: '2015-08-27', apis: ['asm.js', 'WebGL'], noVsync: true, interactive: true, length: 500, mobile: true },
-    { name: "Mandelbrot asm.js", key: 'mandelbrot_asm', url: "2017-07-20-Mandelbrot/mandelbrot_asm.html", size: 268097, heap: 16*1024*1024, compiler: 'e1.37.16', engine: '', date: '2016-07-16', apis: ['wasm', 'Canvas2D'], noVsync: true, interactive: true, mobile: true },
-    { name: "Mandelbrot Wasm", key: 'mandelbrot', url: "2017-07-20-Mandelbrot/mandelbrot.html", size: 254881, heap: 16*1024*1024, compiler: 'e1.37.16', engine: '', date: '2016-07-16', apis: ['wasm', 'Canvas2D'], noVsync: true, interactive: true, mobile: true }
+ //   { name: "10kCubes", key: '10kcubes', url: "2015-08-27-10kCubes/10kCubes.html?/objects&10000", size: 783597, heap: 64*1024*1024, compiler: 'e1.34.6', engine: 'gfxapi', date: '2015-08-27', apis: ['asm.js', 'WebGL'], noVsync: true, interactive: true, length: 500, mobile: true },
+//    { name: "Mandelbrot asm.js", key: 'mandelbrot_asm', url: "2017-07-20-Mandelbrot/mandelbrot_asm.html", size: 268097, heap: 16*1024*1024, compiler: 'e1.37.16', engine: '', date: '2016-07-16', apis: ['wasm', 'Canvas2D'], noVsync: true, interactive: true, mobile: true },
+    { name: "BoatAttack", key: 'boatattack', url: "BoatAttack_20190722_175007_wasm_release_profiling/index.html", size: 117181002, heap: 512*1024*1024, compiler: '', engine: 'Unity 2019.1.0b2', date: '2019-07-22', apis: ['wasm'], noVsync: true, interactive: true, mobile: true },
+    { name: "Microgame - Kart", key: 'microgame_kart', url: "kart-template_20190725_130858_wasm_release_profiling/index.html", size: 37606983, heap: 256*1024*1024, compiler: '', engine: 'Unity 2018.4.4f1', date: '2019-07-25', apis: ['wasm'], noVsync: true, interactive: true, mobile: true },
+    { name: "LWRPTemplate", key: 'lwrptemplate', url: "LWRPTemplate_20190919_204458_wasm_release_profiling/index.html", size: 36726171, heap: 128*1024*1024, compiler: '', engine: 'Unity 2019.1.10f1', date: '2019-09-19', apis: ['wasm'], noVsync: true, interactive: true, mobile: true },
+    { name: "The Explorer", key: 'theexplorer', url: "TheExplorer_20190723_140034_wasm_release_profiling/index.html", size: 172183324, heap: 512*1024*1024, compiler: '', engine: 'Unity 2019.1.10f1', date: '2019-07-23', apis: ['wasm'], noVsync: true, interactive: true, mobile: true },
+    { name: "Ruby's Adventure", key: 'rubysadventure', url: "RubysAdventure_20190722_201255_wasm_release_profiling/index.html", size: 34990078, heap: 64*1024*1024, compiler: '', engine: 'Unity 2019.1.10f1', date: '2019-07-22', apis: ['wasm'], noVsync: true, interactive: true, mobile: true },
+    { name: "Microgame - FPS", key: 'microgame_fps', url: "microgame-fps_20190922_131915_wasm_release_profiling/index.html", size: 56898863, heap: 256*1024*1024, compiler: '', engine: 'Unity 2018.4.5f1', date: '2019-09-22', apis: ['wasm'], noVsync: true, interactive: true, mobile: true }
   ];
 
   // If running on a mobile browser, filter out showing the tests that can't be run on a mobile browser.
