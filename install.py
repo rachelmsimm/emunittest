@@ -219,6 +219,7 @@ def main():
   download_and_unzip('http://clb.confined.space/emunittest_unity/microgame-fps_20190922_131915_wasm_release_profiling.zip', os.path.join(ROOT, 'microgame-fps_20190922_131915_wasm_release_profiling'))
   download_and_unzip('http://clb.confined.space/emunittest_unity/RubysAdventure_20190722_201255_wasm_release_profiling.zip', os.path.join(ROOT, 'RubysAdventure_20190722_201255_wasm_release_profiling'))
   download_and_unzip('http://clb.confined.space/emunittest_unity/TheExplorer_20190723_140034_wasm_release_profiling.zip', os.path.join(ROOT, 'TheExplorer_20190723_140034_wasm_release_profiling'))
+  download_and_unzip('http://clb.confined.space/emunittest_unity/Tanks_20191004_152744_wasm_release_profiling.zip', os.path.join(ROOT, 'Tanks_20191004_152744_wasm_release_profiling'))
 
 if __name__ == '__main__':
   sys.exit(main())
