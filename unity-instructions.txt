@@ -1,0 +1,66 @@
+To make a Unity WebGL build compatible with emunittest harness:
+---------------------------------------------------------------
+
+1. Copy the exported Unity WebGL build into a subdirectory, say my_webgl_game/
+2. Manually edit my_webgl_game/index.html to adjust the game HTML file to be compatible with emunittest. A diff of needed
+   changes is shown below:
+
+diff --git a/original_index.html b/emunittest_compatible_index.html
+--- a/original_index.html
++++ b/emunittest_compatible_index.html
+@@ -6,11 +6,6 @@
+     <title>Unity WebGL Player | My WebGL Game</title>
+     <link rel="shortcut icon" href="TemplateData/favicon.ico">
+     <link rel="stylesheet" href="TemplateData/style.css">
+-    <script src="TemplateData/UnityProgress.js"></script>
+-    <script src="Build/my_webgl_game.asm.loader.js"></script>
+-    <script>
+-      var unityInstance = createUnityInstance("unityContainer", "Build/my_webgl_game.json", {onProgress: UnityProgress});
+-    </script>
+   </head>
+   <body>
+     <div class="webgl-content">
+@@ -21,5 +16,15 @@
+         <div class="title">My WebGL Game</div>
+       </div>
+     </div>
++    <script src='../cpuprofiler.js'></script>
++    <script>var Module = { overrideNumFramesToRender: 500, noRefTest: true }; </script>
++    <script src="../emtimer.js"></script>
++    <script src="inputstream.js"></script>
++    <script src="TemplateData/UnityProgress.js"></script>
++    <script src="Build/my_webgl_game.asm.loader.js"></script>
++    <script>
++      var unityInstance = createUnityInstance("unityContainer", "Build/my_webgl_game.json", {onProgress: UnityProgress});
++      (Module['onRuntimeInitialized']||function(){})();
++    </script>
+   </body>
+ </html>
+
+3. Customize 'overrideNumFramesToRender' field above to choose the length of the demo, in # of frames.
+4. Manually edit file TemplateData/style.css and add the following lines at the end of that file:
+
+body { margin: 0; overflow: hidden; }
+html, body, .webgl-content, #gameContainer, #unityContainer, canvas { width: 100% !important; height: 100% !important; }
+.footer { display: none; }
+.webgl-content { position: static !important; top: 0% !important left: 0% !important; -webkit-transform: translate(0%, 0%); transform: translate(0%, 0%); }
+
+5. Edit emunittest's index.html to add a new entry in the 'var tests = [..]' list, e.g.
+
+var tests = [
+  ...
+{ name: "My WebGL game", key: 'my_webgl_game', url: "my_webgl_game/index.html", size: 0, heap: 0, compiler: '', engine: '', date: '', apis: [''], noVsync: true, interactive: true, mobile: true },
+  ...
+];
+
+After these steps, the new demo is now compatible to run in emunittest suite.
+
+To record a keyboard+mouse input stream for a demo:
+---------------------------------------------------
+
+1. Start the emunittest server, and navigate to http://localhost:6932/my_webgl_game/index.html?record
+2. Play the game, recording keyboard and mouse events
+3. Once the specified number of frames has elapsed, the game canvas will disappear, and the recorded input stream function will appear on the page.
+   Copy-paste these contents to a new file emunittest/my_webgl_game/inputstream.js
+
+After creating the inputstream.js file, the keyboard and mouse input should now play back automatically when the test is run via the test harness.
