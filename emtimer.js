@@ -28,7 +28,8 @@ window.onerror = function(msg, url, line, column, e) {
       cpuIdle: cpuIdle,
       fps: 0,
       pageLoadTime: pageLoadTime,
-      numStutterEvents: 0
+      numStutterEvents: 0,
+      usedJsMemory: typeof performance !== 'undefined' && performance.memory ? performance.memory.usedJSHeapSize : 0
     };
   } else {
     testResults = {
@@ -709,7 +710,8 @@ function doReferenceTest() {
       cpuIdle: cpuIdle,
       fps: fps,
       pageLoadTime: pageLoadTime,
-      numStutterEvents: numStutterEvents
+      numStutterEvents: numStutterEvents,
+      usedJsMemory: typeof performance !== 'undefined' && performance.memory ? performance.memory.usedJSHeapSize : 0
     };
     for(var b in customTestBlocks) {
       testResults[b] = customTestBlocks[b];
@@ -731,6 +733,7 @@ function doReferenceTest() {
                      + '   XMLHttpRequests: How long all page XHR download operations took accumulated (msecs). \n'
                      + '   WebAssembly.compile(): How long WebAssembly Module compilation took (msecs). \n'
                      + '   WebAssembly.instantiate(): How long WebAssembly Module instantiation took (msecs). \n'
+                     + '   usedJsMemory: Number of JavaScript heap bytes in use. (0 if browser does not report this). \n'
                      + '   shaderCompilation: How long it took to compile all page shaders (msecs). \n'
                      + '   readDataBlob: The time it took to read the main asset .data file blob from disk to memory. \n'
                      + '   main(): The time taken in executing the initial application main() function (msecs). \n'

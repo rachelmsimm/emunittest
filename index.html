@@ -321,8 +321,9 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var cpuIdle = padLengthRight(padLengthLeft(t.result.cpuIdle.toFixed(2) + '%', 9), 10);
         var cpuTime = padLengthRight(padLengthLeft(Math.round(t.result.cpuTime) + 'ms', 9), 10);
         var pageLoadTime = padLengthRight(padLengthLeft(t.result.pageLoadTime.toFixed(2) + 'ms', 15), 16);
-        var numStutterEvents = padLengthLeft(t.result.numStutterEvents+'', 19);
-        return time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '\n';
+        var numStutterEvents = padLengthRight(padLengthLeft(t.result.numStutterEvents+'', 19), 20);
+        var usedJsMemory = padLengthLeft(t.result.usedJsMemory == 0 ? 'N/A' : (t.result.usedJsMemory/1024/1024).toFixed(1)+'MB', 12);
+        return time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
       } else {
         return time + '|' + n + '|' + 'ERROR! ' + t.result.error + '\n';
       }
@@ -365,16 +366,19 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var cpuTime = get70PercentAverage(function(p) { return p.cpuTime; });
         var pageLoadTime = get70PercentAverage(function(p) { return p.pageLoadTime; });
         var numStutterEvents = get70PercentAverage(function(p) { return p.numStutterEvents; });
+        var usedJsMemory = get70PercentAverage(function(p) { return p.usedJsMemory; });
+
         var dur = padLengthRight(padLengthLeft(Math.round(totalTime) + 'ms', 29), 30);
-        var fps = padLengthRight(padLengthLeft(fps.toFixed(2), 6), 7);
-        var cpuIdle = padLengthRight(padLengthLeft(cpuIdle.toFixed(2) + '%', 9), 10);
-        var cpuTime = padLengthRight(padLengthLeft(Math.round(cpuTime) + 'ms', 9), 10);
-        var pageLoadTime = padLengthRight(padLengthLeft(pageLoadTime.toFixed(2) + 'ms', 15), 16);
-        var numStutterEvents = padLengthLeft(numStutterEvents.toFixed(1)+'', 19);
-        s += time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '\n';
+        fps = padLengthRight(padLengthLeft(fps.toFixed(2), 6), 7);
+        cpuIdle = padLengthRight(padLengthLeft(cpuIdle.toFixed(2) + '%', 9), 10);
+        cpuTime = padLengthRight(padLengthLeft(Math.round(cpuTime) + 'ms', 9), 10);
+        pageLoadTime = padLengthRight(padLengthLeft(pageLoadTime.toFixed(2) + 'ms', 15), 16);
+        numStutterEvents = padLengthRight(padLengthLeft(numStutterEvents.toFixed(1)+'', 19), 20);
+        usedJsMemory = padLengthLeft(usedJsMemory == 0 ? 'N/A' : (usedJsMemory/1024/1024).toFixed(1)+'MB', 12);
+        s += time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
       }
     }
-    s += '                  |                                       |                              |       |          |          |                |                   \n';
+    s += '                  |                                       |                              |       |          |          |                |                    |            \n';
     s += '</pre>';
     emrun_print(s);
     document.getElementById('full_test_results').innerHTML = s;
@@ -391,8 +395,8 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     if (numTestsRun > 0 && allTestsRun && location.search.toLowerCase().indexOf('autorun') != -1) emrun_exit(numTestsFailed);
   }
 
-  var fullTestLog = ' Run Date         | Test Name                             | Total time (lower is better) |   FPS | CPU Time | CPU Idle | Page load time | # of janked frames\n';
-  fullTestLog    += '------------------------------------------------------------------------------------------------------------------------------------------------------------\n';
+  var fullTestLog = ' Run Date         | Test Name                             | Total time (lower is better) |   FPS | CPU Time | CPU Idle | Page load time | # of janked frames | Used JS Mem\n';
+  fullTestLog    += '--------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n';
 
   // Harness received a completion message from a test window.
   function receiveMessage(event)
