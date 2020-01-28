@@ -24,6 +24,7 @@ window.onerror = function(msg, url, line, column, e) {
       totalTime: totalTime,
       totalRenderTime: totalRenderTime,
       wrongPixels: 0,
+      webGLCpuTime: typeof emscriptenCpuProfiler !== 'undefined' && emscriptenCpuProfiler.sections && emscriptenCpuProfiler.sections[0] && emscriptenCpuProfiler.sections[1] ? (emscriptenCpuProfiler.sections[0].overallTimeInSection + emscriptenCpuProfiler.sections[1].overallTimeInSection) : 0,
       cpuTime: accumulatedCpuTime,
       cpuIdle: cpuIdle,
       fps: 0,
@@ -40,7 +41,7 @@ window.onerror = function(msg, url, line, column, e) {
   top.postMessage({ msg: 'stopGame', key: Module.key, result: testResults }, '*');
 
   unloadAllEventHandlers();
-  if (window.opener) {
+  if (window.opener && injectingInputStream) {
     window.opener.postMessage(testResults, "*");
     window.close();
   }
@@ -706,6 +707,7 @@ function doReferenceTest() {
       totalRenderTime: totalRenderTime,
       wrongPixels: wrong,
       result: testResult,
+      webGLCpuTime: typeof emscriptenCpuProfiler !== 'undefined' && emscriptenCpuProfiler.sections && emscriptenCpuProfiler.sections[0] && emscriptenCpuProfiler.sections[1] ? (emscriptenCpuProfiler.sections[0].overallTimeInSection + emscriptenCpuProfiler.sections[1].overallTimeInSection) : 0,
       cpuTime: accumulatedCpuTime,
       cpuIdle: cpuIdle,
       fps: fps,
@@ -722,6 +724,7 @@ function doReferenceTest() {
                      + '   totalRenderTime: How long time it took from the *end* of the first rendered frame to the end of the last rendered frame (msecs).\n'
                      + '   wrongPixels: The number of pixels that failed the per-pixel reference image test.\n'
                      + '   result: Overall result, either PASS, FAIL (finished but reftest failed) or ERROR (run aborted on exception).\n'
+                     + '   webGLCpuTime: The total CPU time spent inside browser\'s WebGL API functions (msecs).\n'
                      + '   cpuTime: The total CPU time spent inside page code in requestAnimationFrame()s (msecs).\n'
                      + '   cpuIdle: The fraction of animation time that the CPU was not executing user requestAnimationFrame() code (%). This assumes that all time outside rAF() is practically "idle" time.\n'
                      + '   fps: Total frame rate averaged throughout the whole run (frame/second).\n'
@@ -746,14 +749,14 @@ function doReferenceTest() {
 
     if (top) top.postMessage({ msg: 'stopGame', key: Module.key, results: testResults }, '*');
 
-    if (window.opener) {
+    if (window.opener && injectingInputStream) {
       // Post out test results.
       window.opener.postMessage(testResults, "*");
       window.onbeforeunload = null; // Don't call any application onbeforeunload handlers as a response to window.close() below.
       console.log('Done, closing test window.');
       window.close();
     } else {
-      console.log('no window.opener, not closing test window after ref finished (close it manually)');
+      console.log('no window.opener, or not running in playback mode - not closing test window after ref finished (close it manually)');
       enablePageScrolling();
     }
   }
@@ -884,6 +887,15 @@ function simulateWheelEvent(eventType, deltaX, deltaY, deltaZ, deltaMode) {
 }
 
 function simulateKeyEvent(eventType, keyCode, charCode) {
+  var ev = {
+    keyCode: keyCode,
+    which: keyCode,
+    charCode: charCode,
+  };
+  simulateKeyEventJSON(eventType, ev);
+}
+
+function simulateKeyEventJSON(eventType, keyEvent) {
   var canvas = Module['canvas'] || document.querySelector('canvas');
   // Don't use the KeyboardEvent object because of http://stackoverflow.com/questions/8942678/keyboardevent-in-chrome-keycode-is-0/12522752#12522752
   // See also http://output.jsbin.com/awenaq/3
@@ -897,9 +909,9 @@ function simulateKeyEvent(eventType, keyCode, charCode) {
       e.initEvent(eventType, true, true);
     }
 
-  e.keyCode = keyCode;
-  e.which = keyCode;
-  e.charCode = charCode;
+  for(var ev in keyEvent) {
+    e[ev] = keyEvent[ev];
+  }
   e.programmatic = true;
   //  }
 
@@ -916,11 +928,14 @@ function simulateKeyEvent(eventType, keyCode, charCode) {
       var this_ = registeredEventListeners[i][0];
       var type = registeredEventListeners[i][1];
       var listener = registeredEventListeners[i][2];
-      if (type == eventType) listener.call(this_, e);
+      if (type == eventType) {
+        listener.call(this_, e);
+      }
     }
   } else {
+    var dispatchTarget = Module['keyEventDispatchTarget'] || canvas;
     // Dispatch to browser for real
-    canvas.dispatchEvent ? canvas.dispatchEvent(e) : canvas.fireEvent("on" + eventType, e);
+    dispatchTarget.dispatchEvent ? dispatchTarget.dispatchEvent(e) : dispatchTarget.fireEvent("on" + eventType, e);
   }
 }
 
@@ -960,7 +975,7 @@ if (injectingInputStream) {
         var registerListenerToDOM =
              (type.indexOf('mouse') == -1 || Module['dispatchMouseEventsViaDOM'])
           && (type.indexOf('key') == -1 || Module['dispatchKeyEventsViaDOM']);
-        var filteredEventListener = function(e) { try { if (e.programmatic || !e.isTrusted) listener(e); } catch(e) {} };
+        var filteredEventListener = function(e) { try { if (e.programmatic || !e.isTrusted) { listener(e);} } catch(e) {} };
         if (registerListenerToDOM) realAddEventListener.call(this_ || this, type, filteredEventListener, useCapture);
         registeredEventListeners.push([this_ || this, type, filteredEventListener, useCapture]);
       } else {
@@ -1213,11 +1228,37 @@ function captureInputHandlers() {
     });
 
   window.addEventListener("keydown", function(e) {
-    recordedInputStream += 'if (referenceTestFrameNumber == ' + referenceTestFrameNumber + ') simulateKeyEvent("keydown", ' + e.keyCode + ', ' + e.charCode + ');<br>';
+    var ev = {
+      altKey: e.altKey,
+      charCode: e.charCode,
+      code: e.code,
+      ctrlKey: e.ctrlKey,
+      key: e.key,
+      keyCode: e.keyCode,
+      metaKey: e.metaKey,
+      repeat: e.repeat,
+      shiftKey: e.shiftKey,
+      type: e.type,
+      which: e.which
+    }
+    recordedInputStream += 'if (referenceTestFrameNumber == ' + referenceTestFrameNumber + ') simulateKeyEventJSON("keydown", ' + JSON.stringify(ev) + ');<br>';
     });
 
   window.addEventListener("keyup", function(e) {
-    recordedInputStream += 'if (referenceTestFrameNumber == ' + referenceTestFrameNumber + ') simulateKeyEvent("keyup", ' + e.keyCode + ', ' + e.charCode + ');<br>';
+    var ev = {
+      altKey: e.altKey,
+      charCode: e.charCode,
+      code: e.code,
+      ctrlKey: e.ctrlKey,
+      key: e.key,
+      keyCode: e.keyCode,
+      metaKey: e.metaKey,
+      repeat: e.repeat,
+      shiftKey: e.shiftKey,
+      type: e.type,
+      which: e.which
+    }
+    recordedInputStream += 'if (referenceTestFrameNumber == ' + referenceTestFrameNumber + ') simulateKeyEventJSON("keyup", ' + JSON.stringify(ev) + ');<br>';
     });
 }
 

@@ -33,6 +33,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     <input type='checkbox' name='noVsync' id='noVsync' /><label for='noVsync'>Disable vsync</label><br>
     <input type='checkbox' name='fakeGL' id='fakeGL' /><label for='fakeGL'>Disable WebGL</label><br>
     <input type='checkbox' name='cpuProfiler' id='cpuProfiler' /><label for='cpuProfiler'>Show CPU profiler</label><br>
+    <input type='checkbox' name='webglProfiler' id='webglProfiler' /><label for='webglProfiler'>Trace WebGL execution time (requires CPU profiler to also be enabled for this to work)</label><br>
     <input type='checkbox' name='tortureMode' id='tortureMode' /><label for='tortureMode'>Sequential torture mode: immediately starts the selected test(s) again from the beginning after finishing</label><br>
     <input type='checkbox' name='parallelTortureMode' id='parallelTortureMode' onclick='updateNumParallelWindowsEnabled();' /><label for='parallelTortureMode' onclick='updateNumParallelWindowsEnabled();'>Parallel torture mode: runs multiple instances of the same test (Best run in conjunction with disable vsync option. Chain with sequential torture mode for added effect)</label><br>
     <span style='margin-left: 30px'>- Number of parallel pages: <input name='numParallelWindows' id='numParallelWindows' value='3' style='width: 40px;' disabled></span>
@@ -84,7 +85,11 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     { name: "The Explorer", key: 'theexplorer', url: "TheExplorer_20190723_140034_wasm_release_profiling/index.html", size: 172183324, heap: 512*1024*1024, compiler: '', engine: 'Unity 2019.1.10f1', date: '2019-07-23', apis: ['wasm', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
     { name: "Ruby's Adventure", key: 'rubysadventure', url: "RubysAdventure_20190722_201255_wasm_release_profiling/index.html", size: 34990078, heap: 64*1024*1024, compiler: '', engine: 'Unity 2019.1.10f1', date: '2019-07-22', apis: ['wasm', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
     { name: "Microgame - FPS", key: 'microgame_fps', url: "microgame-fps_20190922_131915_wasm_release_profiling/index.html", size: 56898863, heap: 256*1024*1024, compiler: '', engine: 'Unity 2018.4.5f1', date: '2019-09-22', apis: ['wasm', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
-    { name: "Tanks", key: 'tanks', url: "Tanks_20191004_152744_wasm_release_profiling/index.html", size: 38704043, heap: 128*1024*1024, compiler: '', engine: 'Unity 2020.1.0a8 (git trunk)', date: '2019-10-04', apis: ['wasm', 'linear-color-space', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true }
+    { name: "Tanks", key: 'tanks', url: "Tanks_20191004_152744_wasm_release_profiling/index.html", size: 38704043, heap: 128*1024*1024, compiler: '', engine: 'Unity 2020.1.0a8 (git trunk)', date: '2019-10-04', apis: ['wasm', 'linear-color-space', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
+    { name: "TinyRacing v0", key: 'tinyracing', url: "TinyRacing-Wasm-Release-2019-12-12/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: '', date: '2019-12-12', apis: [], noVsync: true, interactive: true, mobile: true },
+    { name: "TinyRacing v1", key: 'tinyracingcustom', url: "TinyRacing-Wasm-Release-2019-12-31/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: '', date: '2019-12-31', apis: [], noVsync: true, interactive: true, mobile: true },
+    { name: "TinyRacing v2 RC", key: 'tinyracingv2', url: "TinyRacing-Wasm-Release-2020-01-24/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: '', date: '2019-01-24', apis: [], noVsync: true, interactive: true, mobile: true },
+    { name: "Lost Crypt", key: 'lostcrypt', url: "LostCrypt_20191220_131436_wasm_release/index.html", size: 97430484, heap: 512*1024*1024, compiler: '', engine: 'Unity 2019.3.0f3', date: '2019-12-20', apis: ['wasm', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true }
   ];
 
   // If running on a mobile browser, filter out showing the tests that can't be run on a mobile browser.
@@ -173,10 +178,12 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
   var currentlyRunningNoVsync = false;
   var currentlyRunningFakeGL = false;
   var currentlyRunningCpuProfiler = false;
+  var currentlyRunningWebGLProfiler = false;
   function runTest(idx, interactive) {
     var fakeGL = document.getElementById('fakeGL').checked;
     var noVsync = document.getElementById('noVsync').checked;
     var cpuProfiler = document.getElementById('cpuProfiler').checked;
+    var webglProfiler = document.getElementById('webglProfiler').checked;
     var test = tests[idx];
     emrun_print('runTest "' + test.name + '"'); // Print progress indication so the harness knows we are not hung.
     currentlyRunningTest = test;
@@ -185,6 +192,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     currentlyRunningNoVsync = noVsync && test.noVsync;
     currentlyRunningFakeGL = fakeGL;
     currentlyRunningCpuProfiler = cpuProfiler;
+    currentlyRunningWebGLProfiler = webglProfiler;
     var url = test.url;
     function addGET(url, get) {
       if (url.indexOf('?') != -1) return url + '&' + get;
@@ -194,6 +202,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     if (noVsync && test.noVsync) url = addGET(url, 'novsync');
     if (fakeGL) url = addGET(url, 'fakegl');
     if (cpuProfiler) url = addGET(url, 'cpuprofiler');
+    if (webglProfiler) url = addGET(url, 'webglprofiler');
     if (test.length) url = addGET(url, 'numframes=' + test.length);
 
     var parallelTortureMode = document.getElementById('parallelTortureMode').checked;
@@ -210,6 +219,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
       'noVsync': noVsync,
       'fakeGL': fakeGL,
       'cpuProfiler': cpuProfiler,
+      'webglProfiler': webglProfiler,
       'runUuid': currentlyRunningTest.runUuid,
       'runOrdinal': allTestResultsByKey[test.key] ? (allTestResultsByKey[test.key].length + 1) : 1
     };
@@ -315,16 +325,23 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var dur = t.result.totalTime + 'ms';
         if (t.result.noVsync) dur += ' (no vsync)';
         if (t.result.fakeGL) dur += ' (no GL)';
-        if (t.result.cpuProfiler) dur += ' (cpuprof)';
+        if (t.result.webglProfiler) dur += ' (cpu+webglprof)';
+        else if (t.result.cpuProfiler) dur += ' (cpuprof)';
         if (t.result.result == 'FAIL') dur += ' (FAILED! diff: ' + t.result.wrongPixels + ')';
         dur = padLengthRight(padLengthLeft(dur, 29), 30);
         var fps = padLengthRight(padLengthLeft(t.result.fps.toFixed(2), 6), 7);
         var cpuIdle = padLengthRight(padLengthLeft(t.result.cpuIdle.toFixed(2) + '%', 9), 10);
+        if (t.result.webGLCpuTime) {
+          var webGLCpuTime = Math.round(t.result.webGLCpuTime) + 'ms (' + (t.result.webGLCpuTime*100.0/t.result.cpuTime).toFixed(2) + '%)';
+        } else {
+          var webGLCpuTime = '(not tracked)';
+        }
+        webGLCpuTime = padLengthRight(padLengthLeft(webGLCpuTime, 17), 18);
         var cpuTime = padLengthRight(padLengthLeft(Math.round(t.result.cpuTime) + 'ms', 9), 10);
         var pageLoadTime = padLengthRight(padLengthLeft(t.result.pageLoadTime.toFixed(2) + 'ms', 15), 16);
         var numStutterEvents = padLengthRight(padLengthLeft(t.result.numStutterEvents+'', 19), 20);
         var usedJsMemory = padLengthLeft(t.result.usedJsMemory == 0 ? 'N/A' : (t.result.usedJsMemory/1024/1024).toFixed(1)+'MB', 12);
-        return time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
+        return time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + webGLCpuTime + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
       } else {
         return time + '|' + n + '|' + 'ERROR! ' + t.result.error + '\n';
       }
@@ -342,11 +359,21 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
             function cmp(a, b) {
               return getField(a) - getField(b);
             }
-            if (results.length <= 3) return results.slice(0);
-            var frac = Math.round(0.7 * results.length);
-            var resultsC = results.slice(0);
+            function filterEmptyElements(arr) {
+              var nonempty = [];
+              for(var i = 0; i < arr.length; ++i) {
+                if (getField(arr[i])) {
+                  nonempty.push(arr[i]);
+                }
+              }
+              return nonempty;
+            }
+            var elemsToInclude = filterEmptyElements(results);
+            if (elemsToInclude.length <= 3) return elemsToInclude.slice(0);
+            var frac = Math.round(0.7 * elemsToInclude.length);
+            var resultsC = elemsToInclude.slice(0);
             resultsC.sort(cmp);
-            var numElementsToRemove = results.length - frac;
+            var numElementsToRemove = elemsToInclude.length - frac;
             var numElementsToRemoveFront = Math.floor(numElementsToRemove/2);
             var numElementsToRemoveBack = numElementsToRemove - numElementsToRemoveFront;
             return resultsC.slice(numElementsToRemoveFront, resultsC.length - numElementsToRemoveBack);
@@ -365,6 +392,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var fps = get70PercentAverage(function(p) { return p.fps; });
         var cpuIdle = get70PercentAverage(function(p) { return p.cpuIdle; });
         var cpuTime = get70PercentAverage(function(p) { return p.cpuTime; });
+        var webGLCpuTime = get70PercentAverage(function(p) { return p.webGLCpuTime; });
         var pageLoadTime = get70PercentAverage(function(p) { return p.pageLoadTime; });
         var numStutterEvents = get70PercentAverage(function(p) { return p.numStutterEvents; });
         var usedJsMemory = get70PercentAverage(function(p) { return p.usedJsMemory; });
@@ -372,14 +400,19 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var dur = padLengthRight(padLengthLeft(Math.round(totalTime) + 'ms', 29), 30);
         fps = padLengthRight(padLengthLeft(fps.toFixed(2), 6), 7);
         cpuIdle = padLengthRight(padLengthLeft(cpuIdle.toFixed(2) + '%', 9), 10);
+        if (webGLCpuTime) {
+          webGLCpuTime = padLengthRight(padLengthLeft(Math.round(webGLCpuTime) + 'ms (' + (webGLCpuTime*100.0/cpuTime).toFixed(2) + '%)', 17), 18);
+        } else {
+          webGLCpuTime = '(not tracked)';
+        }
         cpuTime = padLengthRight(padLengthLeft(Math.round(cpuTime) + 'ms', 9), 10);
         pageLoadTime = padLengthRight(padLengthLeft(pageLoadTime.toFixed(2) + 'ms', 15), 16);
         numStutterEvents = padLengthRight(padLengthLeft(numStutterEvents.toFixed(1)+'', 19), 20);
         usedJsMemory = padLengthLeft(usedJsMemory == 0 ? 'N/A' : (usedJsMemory/1024/1024).toFixed(1)+'MB', 12);
-        s += time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
+        s += time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + webGLCpuTime + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
       }
     }
-    s += '                  |                                       |                              |       |          |          |                |                    |            \n';
+    s += '                  |                                       |                              |       |          |                  |          |                |                    |            \n';
     s += '</pre>';
     emrun_print(s);
     document.getElementById('full_test_results').innerHTML = s;
@@ -396,8 +429,8 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     if (numTestsRun > 0 && allTestsRun && location.search.toLowerCase().indexOf('autorun') != -1) emrun_exit(numTestsFailed);
   }
 
-  var fullTestLog = ' Run Date         | Test Name                             | Total time (lower is better) |   FPS | CPU Time | CPU Idle | Page load time | # of janked frames | Used JS Mem\n';
-  fullTestLog    += '--------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n';
+  var fullTestLog = ' Run Date         | Test Name                             | Total time (lower is better) |   FPS | CPU Time |   WebGL CPU Time | CPU Idle | Page load time | # of janked frames | Used JS Mem\n';
+  fullTestLog += '-'.repeat(fullTestLog.length-1) + '\n';
 
   // Harness received a completion message from a test window.
   function receiveMessage(event)
@@ -409,6 +442,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     testResults.noVsync = currentlyRunningNoVsync;
     testResults.fakeGL = currentlyRunningFakeGL;
     testResults.cpuProfiler = currentlyRunningCpuProfiler;
+    testResults.webglProfiler = currentlyRunningWebGLProfiler;
 
     testResults.browserUuid = browserUuid;
     testResults.startTime = currentlyRunningTest.startTime.yyyymmddhhmmss();

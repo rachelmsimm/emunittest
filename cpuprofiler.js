@@ -134,6 +134,7 @@ var emscriptenCpuProfiler = {
         count: 0,
         name: name,
         startTick: 0,
+        overallTimeInSection: 0,
         accumulatedTimeInsideMainLoop: 0,
         accumulatedTimeOutsideMainLoop: 0,
         frametimesInsideMainLoop: [],
@@ -187,6 +188,7 @@ var emscriptenCpuProfiler = {
       }
       if (this.insideMainLoopRecursionCounter) sect.accumulatedTimeInsideMainLoop += timeInSection;
       else sect.accumulatedTimeOutsideMainLoop += timeInSection;
+      sect.overallTimeInSection += timeInSection;
     }
   },
 
@@ -506,7 +508,7 @@ var emscriptenCpuProfiler = {
     if (l9.indexOf(f) != -1) return 9;
     if (l10.indexOf(f) != -1) return 10;
     if (l11.indexOf(f) != -1) return 11;
-    throw 'Unexpected WebGL function ' + f;
+    console.error('Unexpected WebGL function ' + f);
   },
 
   detectWebGLContext: function() {
@@ -562,6 +564,7 @@ var emscriptenCpuProfiler = {
     var realf = 'real_' + f;
     glCtx[realf] = glCtx[f];
     var numArgs = this_.webGLFunctionLength(f); // On Firefox & Chrome, could do "glCtx[realf].length", but that doesn't work on Edge, which always reports 0.
+    if (numArgs === undefined) return;
     // Accessing 'arguments' is super slow, so to avoid overhead, statically reason the number of arguments.
     switch(numArgs) {
       case 0: glCtx[f] = function webgl_0() { this_.enterSection(section); var ret = glCtx[realf](); this_.endSection(section); return ret; }; break;
