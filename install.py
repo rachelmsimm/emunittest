@@ -223,6 +223,7 @@ def main():
   download_and_unzip('http://clb.confined.space/emunittest_unity/LostCrypt_20191220_131436_wasm_release.zip', os.path.join(ROOT, 'LostCrypt_20191220_131436_wasm_release'))
   download_and_unzip('http://clb.confined.space/emunittest_unity/TinyRacing-Wasm-Release-2019-12-12.zip', os.path.join(ROOT, 'TinyRacing-Wasm-Release-2019-12-12'))
   download_and_unzip('http://clb.confined.space/emunittest_unity/TinyRacing-Wasm-Release-2020-01-24.zip', os.path.join(ROOT, 'TinyRacing-Wasm-Release-2020-01-24'))
+  download_and_unzip('http://clb.confined.space/emunittest_unity/Tiny3D-Wasm-Release-2020-03-01.zip', os.path.join(ROOT, 'Tiny3D-Wasm-Release-2020-03-01'))
 
 if __name__ == '__main__':
   sys.exit(main())
