@@ -224,6 +224,10 @@ def main():
   download_and_unzip('http://clb.confined.space/emunittest_unity/TinyRacing-Wasm-Release-2019-12-12.zip', os.path.join(ROOT, 'TinyRacing-Wasm-Release-2019-12-12'))
   download_and_unzip('http://clb.confined.space/emunittest_unity/TinyRacing-Wasm-Release-2020-01-24.zip', os.path.join(ROOT, 'TinyRacing-Wasm-Release-2020-01-24'))
   download_and_unzip('http://clb.confined.space/emunittest_unity/Tiny3D-Wasm-Release-2020-03-01.zip', os.path.join(ROOT, 'Tiny3D-Wasm-Release-2020-03-01'))
+  download_and_unzip('http://clb.confined.space/emunittest_unity/fastcomp-tinyracing-asmjs-release-2020-03-17.zip', os.path.join(ROOT, 'fastcomp-tinyracing-asmjs-release-2020-03-17.zip'))
+  download_and_unzip('http://clb.confined.space/emunittest_unity/fastcomp-tinyracing-wasm-release-2020-03-17.zip', os.path.join(ROOT, 'fastcomp-tinyracing-wasm-release-2020-03-17'))
+  download_and_unzip('http://clb.confined.space/emunittest_unity/llvm-tinyracing-asmjs-release-closure-2020-03-17.zip', os.path.join(ROOT, 'llvm-tinyracing-asmjs-release-closure-2020-03-17'))
+  download_and_unzip('http://clb.confined.space/emunittest_unity/llvm-tinyracing-wasm-release-2020-03-17.zip', os.path.join(ROOT, 'llvm-tinyracing-wasm-release-2020-03-17'))
 
 if __name__ == '__main__':
   sys.exit(main())

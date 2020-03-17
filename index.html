@@ -88,6 +88,11 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     { name: "Tanks", key: 'tanks', url: "Tanks_20191004_152744_wasm_release_profiling/index.html", size: 38704043, heap: 128*1024*1024, compiler: '', engine: 'Unity 2020.1.0a8 (git trunk)', date: '2019-10-04', apis: ['wasm', 'linear-color-space', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
     { name: "TinyRacing v1", key: 'tinyracing', url: "TinyRacing-Wasm-Release-2019-12-12/TinyRacing.html", size: 5309395, heap: 128*1024*1024, compiler: '', engine: 'DOTS 20191212', date: '2019-12-12', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
     { name: "TinyRacing v2 RC", key: 'tinyracingv2rc', url: "TinyRacing-Wasm-Release-2020-01-24/TinyRacing.html", size: 5991715, heap: 128*1024*1024, compiler: '', engine: 'DOTS 20200124', date: '2020-01-24', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
+    { name: "TinyRacing v3 fc asmjs", key: 'tinyracingv3fcasmjs', url: "fastcomp-tinyracing-asmjs-release-2020-03-17/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: 'DOTS 20200317', date: '2020-03-17', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
+    { name: "TinyRacing v3 fc wasm", key: 'tinyracingv3fcwasm', url: "fastcomp-tinyracing-wasm-release-2020-03-17/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: 'DOTS 20200317', date: '2020-03-17', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
+    { name: "TinyRacing v3 wasm2js", key: 'tinyracingv3wasm2js', url: "llvm-tinyracing-asmjs-release-closure-2020-03-17/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: 'DOTS 20200317', date: '2020-03-17', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
+    { name: "TinyRacing v3 wasm", key: 'tinyracingv3wasm', url: "llvm-tinyracing-wasm-release-2020-03-17/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: 'DOTS 20200317', date: '2020-03-17', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
+    
     { name: "Lost Crypt", key: 'lostcrypt', url: "LostCrypt_20191220_131436_wasm_release/index.html", size: 97430484, heap: 512*1024*1024, compiler: '', engine: 'Unity 2019.3.0f3', date: '2019-12-20', apis: ['wasm', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
     { name: "Tiny3D", key: 'tiny3d', url: "Tiny3D-Wasm-Release-2020-03-01/Tiny3D.html", size: 1780685, heap: 64*1024*1024, compiler: '', engine: 'DOTS 20200301', date: '2020-03-01', apis: ['WebGL 1', 'WebAssembly'], noVsync: true, interactive: true, mobile: true },
   ];
@@ -333,15 +338,18 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var cpuIdle = padLengthRight(padLengthLeft(t.result.cpuIdle.toFixed(2) + '%', 9), 10);
         if (t.result.webGLCpuTime) {
           var webGLCpuTime = Math.round(t.result.webGLCpuTime) + 'ms (' + (t.result.webGLCpuTime*100.0/t.result.cpuTime).toFixed(2) + '%)';
+          var webGLApiCallCount = (t.result.webGLApiCallCount / t.result.numRenderedFrames).toFixed(2);
         } else {
           var webGLCpuTime = '(not tracked)';
+          var webGLApiCallCount = '(not tracked)';
         }
         webGLCpuTime = padLengthRight(padLengthLeft(webGLCpuTime, 17), 18);
+        webGLApiCallCount = padLengthRight(padLengthLeft(webGLApiCallCount, 17), 18);
         var cpuTime = padLengthRight(padLengthLeft(Math.round(t.result.cpuTime) + 'ms', 9), 10);
         var pageLoadTime = padLengthRight(padLengthLeft(t.result.pageLoadTime.toFixed(2) + 'ms', 15), 16);
         var numStutterEvents = padLengthRight(padLengthLeft(t.result.numStutterEvents+'', 19), 20);
         var usedJsMemory = padLengthLeft(t.result.usedJsMemory == 0 ? 'N/A' : (t.result.usedJsMemory/1024/1024).toFixed(1)+'MB', 12);
-        return time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + webGLCpuTime + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
+        return time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + webGLCpuTime + '|' + webGLApiCallCount + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
       } else {
         return time + '|' + n + '|' + 'ERROR! ' + t.result.error + '\n';
       }
@@ -393,6 +401,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var cpuIdle = get70PercentAverage(function(p) { return p.cpuIdle; });
         var cpuTime = get70PercentAverage(function(p) { return p.cpuTime; });
         var webGLCpuTime = get70PercentAverage(function(p) { return p.webGLCpuTime; });
+        var webGLApiCallCount = get70PercentAverage(function(p) { return p.webGLApiCallCount; });
         var pageLoadTime = get70PercentAverage(function(p) { return p.pageLoadTime; });
         var numStutterEvents = get70PercentAverage(function(p) { return p.numStutterEvents; });
         var usedJsMemory = get70PercentAverage(function(p) { return p.usedJsMemory; });
@@ -402,14 +411,16 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         cpuIdle = padLengthRight(padLengthLeft(cpuIdle.toFixed(2) + '%', 9), 10);
         if (webGLCpuTime) {
           webGLCpuTime = padLengthRight(padLengthLeft(Math.round(webGLCpuTime) + 'ms (' + (webGLCpuTime*100.0/cpuTime).toFixed(2) + '%)', 17), 18);
+          webGLApiCallCount = padLengthRight(padLengthLeft((webGLApiCallCount/p.numRenderedFrames).toFixed(2), 17), 18);
         } else {
           webGLCpuTime = '(not tracked)';
+          webGLApiCallCount = '(not tracked)';
         }
         cpuTime = padLengthRight(padLengthLeft(Math.round(cpuTime) + 'ms', 9), 10);
         pageLoadTime = padLengthRight(padLengthLeft(pageLoadTime.toFixed(2) + 'ms', 15), 16);
         numStutterEvents = padLengthRight(padLengthLeft(numStutterEvents.toFixed(1)+'', 19), 20);
         usedJsMemory = padLengthLeft(usedJsMemory == 0 ? 'N/A' : (usedJsMemory/1024/1024).toFixed(1)+'MB', 12);
-        s += time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + webGLCpuTime + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
+        s += time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + webGLCpuTime + '|' + webGLApiCallCount + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
       }
     }
     s += '                  |                                       |                              |       |          |                  |          |                |                    |            \n';
@@ -429,7 +440,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     if (numTestsRun > 0 && allTestsRun && location.search.toLowerCase().indexOf('autorun') != -1) emrun_exit(numTestsFailed);
   }
 
-  var fullTestLog = ' Run Date         | Test Name                             | Total time (lower is better) |   FPS | CPU Time |   WebGL CPU Time | CPU Idle | Page load time | # of janked frames | Used JS Mem\n';
+  var fullTestLog = ' Run Date         | Test Name                             | Total time (lower is better) |   FPS | CPU Time |   WebGL CPU Time | WebGL calls/frame| CPU Idle | Page load time | # of janked frames | Used JS Mem\n';
   fullTestLog += '-'.repeat(fullTestLog.length-1) + '\n';
 
   // Harness received a completion message from a test window.

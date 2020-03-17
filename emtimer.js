@@ -21,10 +21,12 @@ window.onerror = function(msg, url, line, column, e) {
     var fps = numFramesToRender * 1000.0 / totalRenderTime;
     testResults = {
       result: 'PASS',
+      numRenderedFrames: numFramesToRender,
       totalTime: totalTime,
       totalRenderTime: totalRenderTime,
       wrongPixels: 0,
       webGLCpuTime: typeof emscriptenCpuProfiler !== 'undefined' && emscriptenCpuProfiler.sections && emscriptenCpuProfiler.sections[0] && emscriptenCpuProfiler.sections[1] ? (emscriptenCpuProfiler.sections[0].overallTimeInSection + emscriptenCpuProfiler.sections[1].overallTimeInSection) : 0,
+      webGLApiCallCount: typeof emscriptenCpuProfiler !== 'undefined' && emscriptenCpuProfiler.sections && emscriptenCpuProfiler.sections[0] && emscriptenCpuProfiler.sections[1] ? (emscriptenCpuProfiler.sections[0].visitedCount + emscriptenCpuProfiler.sections[1].visitedCount) : 0,
       cpuTime: accumulatedCpuTime,
       cpuIdle: cpuIdle,
       fps: 0,
@@ -703,11 +705,13 @@ function doReferenceTest() {
     }
 
     var testResults = {
+      numRenderedFrames: numFramesToRender,
       totalTime: totalTime,
       totalRenderTime: totalRenderTime,
       wrongPixels: wrong,
       result: testResult,
       webGLCpuTime: typeof emscriptenCpuProfiler !== 'undefined' && emscriptenCpuProfiler.sections && emscriptenCpuProfiler.sections[0] && emscriptenCpuProfiler.sections[1] ? (emscriptenCpuProfiler.sections[0].overallTimeInSection + emscriptenCpuProfiler.sections[1].overallTimeInSection) : 0,
+      webGLApiCallCount: typeof emscriptenCpuProfiler !== 'undefined' && emscriptenCpuProfiler.sections && emscriptenCpuProfiler.sections[0] && emscriptenCpuProfiler.sections[1] ? (emscriptenCpuProfiler.sections[0].visitedCount + emscriptenCpuProfiler.sections[1].visitedCount) : 0,
       cpuTime: accumulatedCpuTime,
       cpuIdle: cpuIdle,
       fps: fps,

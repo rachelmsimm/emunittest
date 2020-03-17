@@ -135,6 +135,7 @@ var emscriptenCpuProfiler = {
         name: name,
         startTick: 0,
         overallTimeInSection: 0,
+        visitedCount: 0,
         accumulatedTimeInsideMainLoop: 0,
         accumulatedTimeOutsideMainLoop: 0,
         frametimesInsideMainLoop: [],
@@ -189,6 +190,7 @@ var emscriptenCpuProfiler = {
       if (this.insideMainLoopRecursionCounter) sect.accumulatedTimeInsideMainLoop += timeInSection;
       else sect.accumulatedTimeOutsideMainLoop += timeInSection;
       sect.overallTimeInSection += timeInSection;
+      sect.visitedCount++;
     }
   },
 
