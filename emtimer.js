@@ -461,6 +461,7 @@ if (!Module['providesRafIntegration']) {
   if (!window.realRequestAnimationFrame) {
     window.realRequestAnimationFrame = window.requestAnimationFrame;
     window.requestAnimationFrame = function(cb) {
+      if (numStartupBlockerXHRsPending == 0) onRuntimeInitialized();
       function hookedCb(p) {
         if (typeof Module !== 'undefined' && !Module['TOTAL_MEMORY'] && Module['preMainLoop']) Module['preMainLoop'](); // If we are running a non-Emscripten app, pump pre/post main loop handlers for cpu profiler (Module.TOTAL_MEMORY hints if this was Emscripten or not)
         if (typeof Module !== 'undefined' && Module['referenceTestPreTick']) Module['referenceTestPreTick']();
@@ -1187,12 +1188,17 @@ function referenceTestTick() {
 }
 Module['referenceTestTick'] = referenceTestTick;
 
-Module['onRuntimeInitialized'] = function() {
+// This function is called when the initial loading (main()) has completed, and the game is about to start
+// ticking its requestAnimationFrame() loop
+function onRuntimeInitialized() {
+  if (runtimeInitialized) return;
   fakedTime = 0;
   referenceTestFrameNumber = 0;
   runtimeInitialized = 1;
   if (typeof cpuprofiler_add_hooks !== 'undefined' && location.search.indexOf('cpuprofiler') != -1) cpuprofiler_add_hooks();
 }
+
+Module['onRuntimeInitialized'] = onRuntimeInitialized;
 
 // Maps mouse coordinate from canvas CSS pixels to normalized [0,1] range. In y coordinate y grows downwards.
 function computeNormalizedCanvasPos(e) {
