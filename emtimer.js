@@ -598,11 +598,13 @@ function loadReferenceImage() {
   img.crossOrigin = 'Anonymous'; 
   img.onload = function() {
     var canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
+    canvas.width = img.naturalWidth * window.devicePixelRatio;
+    canvas.height = img.naturalHeight * window.devicePixelRatio;
+    canvas.style.width = img.naturalWidth + 'px';
+    canvas.style.height = img.naturalHeight + 'px';
     var ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
-    emtimerOptions['referenceImageData'] = ctx.getImageData(0, 0, img.width, img.height).data;
+    emtimerOptions['referenceImageData'] = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
   }
   emtimerOptions['referenceImage'] = img;
 }
@@ -651,33 +653,40 @@ function doReferenceTest() {
     try {
       var div = document.createElement('div');
 
+      var pixelWidth = canvas.width;
+      var pixelHeight = canvas.height;
+      actualImage.width = pixelWidth / window.devicePixelRatio;
+      actualImage.height = pixelHeight / window.devicePixelRatio;
+
       var actualCanvas = document.createElement('canvas');
-      actualCanvas.width = actualImage.width;
-      actualCanvas.height = actualImage.height;
+      actualCanvas.width = pixelWidth;
+      actualCanvas.height = pixelHeight;
+      actualCanvas.style.width = actualImage.width + 'px';
+      actualCanvas.style.height = actualImage.height + 'px';
       var actualCtx = actualCanvas.getContext('2d');
       actualCtx.drawImage(actualImage, 0, 0);
-      var actual = actualCtx.getImageData(0, 0, actualImage.width, actualImage.height).data;
+      var actual = actualCtx.getImageData(0, 0, pixelWidth, pixelHeight).data;
 
       var fakegl = (location.search.indexOf('fakegl') != -1);
 
       var wrong = 0;
       if (!emtimerOptions['noRefTest'] && !fakegl) {
         var img = emtimerOptions['referenceImage'];
+        img.style.width = actualImage.width + 'px';
+        img.style.height = actualImage.height + 'px';
 
         var total = 0;
-        var width = img.width;
-        var height = img.height;
         var expected = emtimerOptions['referenceImageData'];
         // Compute per-pixel error diff.
-        for (var x = 0; x < width; x++) {
-          for (var y = 0; y < height; y++) {
-            total += Math.abs(expected[y*width*4 + x*4 + 0] - actual[y*width*4 + x*4 + 0]);
-            total += Math.abs(expected[y*width*4 + x*4 + 1] - actual[y*width*4 + x*4 + 1]);
-            total += Math.abs(expected[y*width*4 + x*4 + 2] - actual[y*width*4 + x*4 + 2]);
+        for (var x = 0; x < pixelWidth; x++) {
+          for (var y = 0; y < pixelHeight; y++) {
+            total += Math.abs(expected[y*pixelWidth*4 + x*4 + 0] - actual[y*pixelWidth*4 + x*4 + 0]);
+            total += Math.abs(expected[y*pixelWidth*4 + x*4 + 1] - actual[y*pixelWidth*4 + x*4 + 1]);
+            total += Math.abs(expected[y*pixelWidth*4 + x*4 + 2] - actual[y*pixelWidth*4 + x*4 + 2]);
           }
         }
 
-        wrong = Math.floor(total / (img.width*img.height*3)); // floor, to allow some margin of error for antialiasing
+        wrong = Math.floor(total / (pixelWidth*pixelHeight*3)); // floor, to allow some margin of error for antialiasing
       }
 
       // Hide all other elements on the page, only show the expected and observed rendered images.
