@@ -1,5 +1,7 @@
-// emtimer.js
-// This script contains the harness content that is embedded on each executed page.
+// emtimer.js, emunittest testing harness script.
+// This script makes rAF() animation runs deterministic, useful replaying identical runs for benchmarking.
+
+var emtimerOptions = typeof emtimerOptions !== 'undefined' ? emtimerOptions : (typeof Module !== 'undefined' ? Module : {});
 
 // If an error occurs on the page, fast-quit execution and return to harness with an error.
 window.onerror = function(msg, url, line, column, e) {
@@ -16,7 +18,7 @@ window.onerror = function(msg, url, line, column, e) {
   if (msg == 'uncaught exception: exit') { // Normal exit from test
     var timeEnd = performance.realNow();
     var totalTime = timeEnd - pageStartupT0; // Total time, including everything.
-    var totalRenderTime = timeEnd - Module['timeStart'];
+    var totalRenderTime = timeEnd - emtimerOptions['timeStart'];
     var cpuIdle = accumulatedCpuIdleTime * 100.0 / totalRenderTime;
     var fps = numFramesToRender * 1000.0 / totalRenderTime;
     testResults = {
@@ -40,7 +42,7 @@ window.onerror = function(msg, url, line, column, e) {
       error: msg
     };
   }
-  top.postMessage({ msg: 'stopGame', key: Module.key, result: testResults }, '*');
+  top.postMessage({ msg: 'stopGame', key: emtimerOptions.key, result: testResults }, '*');
 
   unloadAllEventHandlers();
   if (window.opener && injectingInputStream) {
@@ -58,11 +60,11 @@ var injectingInputStream = location.search.indexOf('playback') != -1;
 
 // Allow disabling audio altogether on the page to enable profiling what kind of performance/correctness effect it may have on execution.
 var disableAudio = location.search.indexOf('noaudio') != -1;
-Module['disableAudio'] = disableAudio;
+emtimerOptions['disableAudio'] = disableAudio;
 
 // In test mode (injectingInputStream == true), we always render this many fixed frames, after which the test is considered finished.
 // ?numframes=number GET parameter can override custom test length.
-var numFramesToRender = Module['overrideNumFramesToRender'] > 0 ? Module['overrideNumFramesToRender'] : 2000;
+var numFramesToRender = emtimerOptions['overrideNumFramesToRender'] > 0 ? emtimerOptions['overrideNumFramesToRender'] : 2000;
 
 if (location.search.indexOf('numframes=') != -1) {
   numFramesToRender = parseInt(location.search.substring(location.search.indexOf('numframes=') + 'numframes='.length));
@@ -205,10 +207,10 @@ class MockDate {
 }
 
 if (injectingInputStream || recordingInputStream) {
-  if (!Module['dontOverrideTime']) {
+  if (!emtimerOptions['dontOverrideTime']) {
     Date = MockDate;
-    var timeScale = (typeof Module['fakeTimeScale'] !== 'undefined') ? Module['fakeTimeScale'] : 1.0;
-    if (Module['needsFakeMonotonouslyIncreasingTimer']) {
+    var timeScale = (typeof emtimerOptions['fakeTimeScale'] !== 'undefined') ? emtimerOptions['fakeTimeScale'] : 1.0;
+    if (emtimerOptions['needsFakeMonotonouslyIncreasingTimer']) {
       Date.now = function() { fakedTime += timeScale; return fakedTime; }
       performance.now = function() { fakedTime += timeScale; return fakedTime; }
     } else {
@@ -240,7 +242,7 @@ function injectMathFunc(f) {
   }
 }
 
-if (Module['injectMathFunctions'] && (recordingInputStream || injectingInputStream)) {
+if (emtimerOptions['injectMathFunctions'] && (recordingInputStream || injectingInputStream)) {
   var mathFuncs = ['acos', 'acosh', 'asin', 'asinh', 'atan', 'atanh', 'atan2', 'cbrt', 'cos', 'cosh', 'exp', 'expm1', 'log', 'log1p', 'log10', 'log2', 'pow', 'sin', 'sinh', 'sqrt', 'tan', 'tanh'];
   for(var i in mathFuncs) injectMathFunc(mathFuncs[i]);
 }
@@ -265,12 +267,12 @@ function totalProgress() {
       bytesTotal += x.bytesTotal;
     }
   }
-  if (Module['demoAssetSizeInBytes']) {
-    if (bytesTotal > Module['demoAssetSizeInBytes']) {
-      console.error('Game downloaded ' + bytesTotal + ' bytes, expected demo size was only ' + Module['demoAssetSizeInBytes'] + '!');
-      Module['demoAssetSizeInBytes'] = bytesTotal;
+  if (emtimerOptions['demoAssetSizeInBytes']) {
+    if (bytesTotal > emtimerOptions['demoAssetSizeInBytes']) {
+      console.error('Game downloaded ' + bytesTotal + ' bytes, expected demo size was only ' + emtimerOptions['demoAssetSizeInBytes'] + '!');
+      emtimerOptions['demoAssetSizeInBytes'] = bytesTotal;
     }
-    bytesTotal = Module['demoAssetSizeInBytes'];
+    bytesTotal = emtimerOptions['demoAssetSizeInBytes'];
   }
   if (bytesTotal == 0) return 1.0;
   return Math.min(1.0, bytesLoaded / bytesTotal);
@@ -301,7 +303,7 @@ function fetchCachedPackage(db, packageName, callback, errback) {
   try {
     var transaction = db.transaction(['FILES'], 'readonly');
     var packages = transaction.objectStore('FILES');
-    var getRequest = packages.get("file/" + Module.key + '/' + packageName);
+    var getRequest = packages.get("file/" + emtimerOptions.key + '/' + packageName);
     getRequest.onsuccess = function(event) {
       if (event.target.result) {
         var len = event.target.result.byteLength || event.target.result.length;
@@ -330,7 +332,7 @@ function cacheRemotePackage(db, packageName, packageData, callback, errback) {
   try {
     var transaction = db.transaction(['FILES'], 'readwrite');
     var packages = transaction.objectStore('FILES');
-    var putRequest = packages.put(packageData, "file/" + Module.key + '/' + packageName);
+    var putRequest = packages.put(packageData, "file/" + emtimerOptions.key + '/' + packageName);
     putRequest.onsuccess = function(event) {
       console.log('Stored file ' + packageName + ' to IndexedDB cache.');
       callback(packageName);
@@ -367,9 +369,9 @@ function idbError(e) {
 
 var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-var injectXMLHttpRequests = Module['injectXMLHttpRequests'] && !isMobile;
+var injectXMLHttpRequests = emtimerOptions['injectXMLHttpRequests'] && !isMobile;
 if (injectXMLHttpRequests) {
-  openDatabase(Module.xhrCacheName || 'xhrCache', Module.xhrCacheVersion || 3, idbOpened, idbError);
+  openDatabase(emtimerOptions.xhrCacheName || 'xhrCache', emtimerOptions.xhrCacheVersion || 3, idbOpened, idbError);
 }
 
 function withIndexedDb(func) {
@@ -393,7 +395,7 @@ function clearIndexedDBCache(dbName, onsuccess, onerror, onblocked) {
 function preloadXHR(url, responseType, onload, startupBlocker) {
   if (startupBlocker) ++numStartupBlockerXHRsPending; // Used to detect when game time should start.
   ++numPreloadXHRsInFlight; // Used to detect when the last preload XHR has finished and the game loading can start.
-  top.postMessage({ msg: 'preloadGame', key: Module.key }, '*');
+  top.postMessage({ msg: 'preloadGame', key: emtimerOptions.key }, '*');
 
   function finished(xhrOrData) {
     if (xhrOrData instanceof realXMLHttpRequest) preloadedXHRs[responseType + '_' + url] = xhrOrData;
@@ -413,7 +415,7 @@ function preloadXHR(url, responseType, onload, startupBlocker) {
       bytesLoaded: len,
       bytesTotal: len
     };
-    top.postMessage({ msg: 'preloadProgress', key: Module.key, progress: totalProgress() }, '*');
+    top.postMessage({ msg: 'preloadProgress', key: emtimerOptions.key, progress: totalProgress() }, '*');
 
     if (onload) onload();
     // Once all XHRs are finished, trigger the page to start running.
@@ -430,7 +432,7 @@ function preloadXHR(url, responseType, onload, startupBlocker) {
     xhr.onprogress = function(evt) {
       if (evt.lengthComputable) {
         preloadXHRProgress[responseType + '_' + url] = { bytesLoaded: evt.loaded, bytesTotal: evt.total};
-        top.postMessage({ msg: 'preloadProgress', key: Module.key, progress: totalProgress() }, '*');
+        top.postMessage({ msg: 'preloadProgress', key: emtimerOptions.key, progress: totalProgress() }, '*');
       }
     }
     xhr.onload = function() {
@@ -457,16 +459,16 @@ function preloadXHR(url, responseType, onload, startupBlocker) {
   });
 }
 
-if (!Module['providesRafIntegration']) {
+if (!emtimerOptions['providesRafIntegration']) {
   if (!window.realRequestAnimationFrame) {
     window.realRequestAnimationFrame = window.requestAnimationFrame;
     window.requestAnimationFrame = function(cb) {
       if (numStartupBlockerXHRsPending == 0) onRuntimeInitialized();
       function hookedCb(p) {
         if (typeof Module !== 'undefined' && !Module['TOTAL_MEMORY'] && Module['preMainLoop']) Module['preMainLoop'](); // If we are running a non-Emscripten app, pump pre/post main loop handlers for cpu profiler (Module.TOTAL_MEMORY hints if this was Emscripten or not)
-        if (typeof Module !== 'undefined' && Module['referenceTestPreTick']) Module['referenceTestPreTick']();
+        referenceTestPreTick();
         cb(performance.now());
-        if (typeof Module !== 'undefined' && Module['referenceTestTick']) Module['referenceTestTick']();
+        referenceTestTick();
         if (typeof Module !== 'undefined' && !Module['TOTAL_MEMORY'] && Module['postMainLoop']) Module['postMainLoop']();
       }
       return window.realRequestAnimationFrame(hookedCb);
@@ -514,7 +516,7 @@ if (injectXMLHttpRequests) {
         }, 1);
       } else {
         // To keep the execution coherent for the current set of demos, kill certain outbound XHRs so they don't stall the run.
-        if (typeof Module['xhrFilter'] === 'function' && Module['xhrFilter'](this.url_)) return;
+        if (typeof emtimerOptions['xhrFilter'] === 'function' && emtimerOptions['xhrFilter'](this.url_)) return;
 
         // Attempt to download the asset from IndexedDB cache.
         function idbSuccess(data) {
@@ -529,7 +531,7 @@ if (injectXMLHttpRequests) {
           };
           var len = data.byteLength || data.length;
           preloadXHRProgress[this_.responseType_ + '_' + this_.url_] = { bytesLoaded: len, bytesTotal: len };
-          top.postMessage({ msg: 'preloadProgress', key: Module.key, progress: totalProgress() }, '*');
+          top.postMessage({ msg: 'preloadProgress', key: emtimerOptions.key, progress: totalProgress() }, '*');
           if (this_.onprogress) {
             var len = data.byteLength || data.length;
             this_.onprogress({ loaded: len, total: len });
@@ -543,7 +545,7 @@ if (injectXMLHttpRequests) {
           this_.xhr_.onprogress = function(evt) {
             if (evt.lengthComputable) {
               preloadXHRProgress[this_.responseType_ + '_' + this_.url_] = { bytesLoaded: evt.loaded, bytesTotal: evt.total};
-              top.postMessage({ msg: 'preloadProgress', key: Module.key, progress: totalProgress() }, '*');
+              top.postMessage({ msg: 'preloadProgress', key: emtimerOptions.key, progress: totalProgress() }, '*');
             }
             if (this_.onprogress) this_.onprogress(evt);
           }
@@ -590,7 +592,7 @@ if (injectXMLHttpRequests) {
 // XHRs in the expected render output image, always 'reference.png' in the root directory of the test.
 function loadReferenceImage() {
   var img = new Image();
-  img.src = Module['reftestURL'] || 'reference.png';
+  img.src = emtimerOptions['reftestURL'] || 'reference.png';
   // reference.png might come from a different domain than the canvas, so don't let it taint ctx.getImageData().
   // See https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image
   img.crossOrigin = 'Anonymous'; 
@@ -600,9 +602,9 @@ function loadReferenceImage() {
     canvas.height = img.height;
     var ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
-    Module['referenceImageData'] = ctx.getImageData(0, 0, img.width, img.height).data;
+    emtimerOptions['referenceImageData'] = ctx.getImageData(0, 0, img.width, img.height).data;
   }
-  Module['referenceImage'] = img;
+  emtimerOptions['referenceImage'] = img;
 }
 
 // This function can be called from the test code to report any custom test result scores. These will then
@@ -622,8 +624,10 @@ function doReferenceTest() {
   var canvas;
   // Find Emscripten-specific location of the GL context that the page has been rendering to.
   if (typeof GLctx !== 'undefined') canvas = GLctx.canvas;
-  else if (Module.ctx) canvas = Module.ctx.canvas;
-  else if (Module['canvas']) canvas = Module['canvas'];
+  else if (emtimerOptions.ctx) canvas = emtimerOptions.ctx.canvas;
+  else if (emtimerOptions['canvas']) canvas = emtimerOptions['canvas'];
+  else if (typeof Module !== 'undefined' && Module.ctx) canvas = Module.ctx.canvas;
+  else if (typeof Module !== 'undefined' && Module['canvas']) canvas = Module['canvas'];
   else {
     canvas = document.querySelector('canvas');
     if (!canvas) throw 'Cannot find application canvas!';
@@ -635,7 +639,7 @@ function doReferenceTest() {
   function reftest() {
     var timeEnd = performance.realNow();
     var totalTime = timeEnd - pageStartupT0; // Total time, including everything.
-    var totalRenderTime = timeEnd - Module['timeStart'];
+    var totalRenderTime = timeEnd - emtimerOptions['timeStart'];
     var cpuIdle = accumulatedCpuIdleTime * 100.0 / totalRenderTime;
     var fps = numFramesToRender * 1000.0 / totalRenderTime;
     var wrong = Infinity;
@@ -657,13 +661,13 @@ function doReferenceTest() {
       var fakegl = (location.search.indexOf('fakegl') != -1);
 
       var wrong = 0;
-      if (!Module['noRefTest'] && !fakegl) {
-        var img = Module['referenceImage'];
+      if (!emtimerOptions['noRefTest'] && !fakegl) {
+        var img = emtimerOptions['referenceImage'];
 
         var total = 0;
         var width = img.width;
         var height = img.height;
-        var expected = Module['referenceImageData'];
+        var expected = emtimerOptions['referenceImageData'];
         // Compute per-pixel error diff.
         for (var x = 0; x < width; x++) {
           for (var y = 0; y < height; y++) {
@@ -752,7 +756,7 @@ function doReferenceTest() {
 
     if (document.getElementById('testResults')) document.getElementById('testResults').innerHTML = 'var results = ' + JSON.stringify(testResults, null, '\t') + ';\n' + instructions;
 
-    if (top) top.postMessage({ msg: 'stopGame', key: Module.key, results: testResults }, '*');
+    if (top) top.postMessage({ msg: 'stopGame', key: emtimerOptions.key, results: testResults }, '*');
 
     if (window.opener && injectingInputStream) {
       // Post out test results.
@@ -780,11 +784,15 @@ function doReferenceTest() {
   }
 }
 
+function findCanvas() {
+  return emtimerOptions['canvas'] || (typeof Module !== 'undefined' && Module['canvas']) || document.querySelector('canvas');
+}
+
 // eventType: "mousemove", "mousedown" or "mouseup".
 // x and y: Normalized coordinate in the range [0,1] where to inject the event.
 // button: which button was clicked. 0 = mouse left button. If eventType="mousemove", pass 0.
 function simulateMouseEvent(eventType, x, y, button) {
-  var canvas = Module['canvas'] || document.querySelector('canvas');
+  var canvas = findCanvas();
   // Remap from [0,1] to canvas CSS pixel size.
   x *= canvas.clientWidth;
   y *= canvas.clientHeight;
@@ -800,14 +808,14 @@ function simulateMouseEvent(eventType, x, y, button) {
   e.programmatic = true;
 
   // Dispatch to Emscripten's html5.h API:
-  if (Module['usesEmscriptenHTML5InputAPI'] && typeof JSEvents !== 'undefined' && JSEvents.eventHandlers && JSEvents.eventHandlers.length > 0) {
+  if (emtimerOptions['usesEmscriptenHTML5InputAPI'] && typeof JSEvents !== 'undefined' && JSEvents.eventHandlers && JSEvents.eventHandlers.length > 0) {
     for(var i = 0; i < JSEvents.eventHandlers.length; ++i) {
       if ((JSEvents.eventHandlers[i].target == canvas || JSEvents.eventHandlers[i].target == window)
        && JSEvents.eventHandlers[i].eventTypeString == eventType) {
          JSEvents.eventHandlers[i].handlerFunc(e);
       }
     }
-  } else if (!Module['dispatchMouseEventsViaDOM']) {
+  } else if (!emtimerOptions['dispatchMouseEventsViaDOM']) {
     // Programmatically reating DOM events doesn't allow specifying offsetX & offsetY properly
     // for the element, but they must be the same as clientX & clientY. Therefore we can't have a
     // border that would make these different.
@@ -820,7 +828,7 @@ function simulateMouseEvent(eventType, x, y, button) {
       var type = registeredEventListeners[i][1];
       var listener = registeredEventListeners[i][2];
       if (type == eventType) {
-        if (Module['needsCompleteCustomMouseEventFields']) {
+        if (emtimerOptions['needsCompleteCustomMouseEventFields']) {
           // If needsCompleteCustomMouseEventFields is set, the page needs a full set of attributes
           // specified in the MouseEvent object. However most fields on MouseEvent are read-only, so create
           // a new custom object (without prototype chain) to hold the overridden properties.
@@ -882,7 +890,7 @@ function simulateMouseEvent(eventType, x, y, button) {
 }
 
 function simulateWheelEvent(eventType, deltaX, deltaY, deltaZ, deltaMode) {
-  var canvas = Module['canvas'] || document.querySelector('canvas');
+  var canvas = findCanvas();
   var e = new Event('wheel');
   e.deltaX = deltaX;
   e.deltaY = deltaY;
@@ -901,7 +909,7 @@ function simulateKeyEvent(eventType, keyCode, charCode) {
 }
 
 function simulateKeyEventJSON(eventType, keyEvent) {
-  var canvas = Module['canvas'] || document.querySelector('canvas');
+  var canvas = findCanvas();
   // Don't use the KeyboardEvent object because of http://stackoverflow.com/questions/8942678/keyboardevent-in-chrome-keycode-is-0/12522752#12522752
   // See also http://output.jsbin.com/awenaq/3
   //    var e = document.createEvent('KeyboardEvent');
@@ -921,14 +929,14 @@ function simulateKeyEventJSON(eventType, keyEvent) {
   //  }
 
   // Dispatch directly to Emscripten's html5.h API:
-  if (Module['usesEmscriptenHTML5InputAPI'] && typeof JSEvents !== 'undefined' && JSEvents.eventHandlers && JSEvents.eventHandlers.length > 0) {
+  if (emtimerOptions['usesEmscriptenHTML5InputAPI'] && typeof JSEvents !== 'undefined' && JSEvents.eventHandlers && JSEvents.eventHandlers.length > 0) {
     for(var i = 0; i < JSEvents.eventHandlers.length; ++i) {
       if ((JSEvents.eventHandlers[i].target == canvas || JSEvents.eventHandlers[i].target == window)
        && JSEvents.eventHandlers[i].eventTypeString == eventType) {
          JSEvents.eventHandlers[i].handlerFunc(e);
       }
     }
-  } else if (!Module['dispatchKeyEventsViaDOM']) {
+  } else if (!emtimerOptions['dispatchKeyEventsViaDOM']) {
     for(var i = 0; i < registeredEventListeners.length; ++i) {
       var this_ = registeredEventListeners[i][0];
       var type = registeredEventListeners[i][1];
@@ -938,17 +946,10 @@ function simulateKeyEventJSON(eventType, keyEvent) {
       }
     }
   } else {
-    var dispatchTarget = Module['keyEventDispatchTarget'] || canvas;
+    var dispatchTarget = emtimerOptions['keyEventDispatchTarget'] || canvas;
     // Dispatch to browser for real
     dispatchTarget.dispatchEvent ? dispatchTarget.dispatchEvent(e) : dispatchTarget.fireEvent("on" + eventType, e);
   }
-}
-
-var Module;
-if (typeof Module === 'undefined') {
-  Module = {
-    canvas: document.getElementsByTagName('canvas')[0]
-  };
 }
 
 if (injectingInputStream) {
@@ -969,7 +970,7 @@ if (injectingInputStream) {
 
   // Some game demos programmatically fire the resize event. For Firefox and Chrome, we detect this via event.isTrusted and know to correctly pass it through, but to make Safari happy,
   // it's just easier to let resize come through for those demos that need it.
-  if (!Module['pageNeedsResizeEvent']) overriddenMessageTypes.push('resize');
+  if (!emtimerOptions['pageNeedsResizeEvent']) overriddenMessageTypes.push('resize');
 
   // If this_ is specified, addEventListener is called using that as the 'this' object. Otherwise the current this is used.
   function replaceEventListener(obj, this_) {
@@ -978,8 +979,8 @@ if (injectingInputStream) {
       ensureNoClientHandlers();
       if (overriddenMessageTypes.indexOf(type) != -1) {
         var registerListenerToDOM =
-             (type.indexOf('mouse') == -1 || Module['dispatchMouseEventsViaDOM'])
-          && (type.indexOf('key') == -1 || Module['dispatchKeyEventsViaDOM']);
+             (type.indexOf('mouse') == -1 || emtimerOptions['dispatchMouseEventsViaDOM'])
+          && (type.indexOf('key') == -1 || emtimerOptions['dispatchKeyEventsViaDOM']);
         var filteredEventListener = function(e) { try { if (e.programmatic || !e.isTrusted) { listener(e);} } catch(e) {} };
         if (registerListenerToDOM) realAddEventListener.call(this_ || this, type, filteredEventListener, useCapture);
         registeredEventListeners.push([this_ || this, type, filteredEventListener, useCapture]);
@@ -992,8 +993,8 @@ if (injectingInputStream) {
   if (typeof EventTarget !== 'undefined') {
     replaceEventListener(EventTarget.prototype, null);
   } else {
-    var eventListenerObjectsToReplace = [window, document, document.body, Module['canvas'] || document.querySelector('canvas')];
-    if (Module['extraDomElementsWithEventListeners']) eventListenerObjectsToReplace = eventListenerObjectsToReplace.concat(Module['extraDomElementsWithEventListeners']);
+    var eventListenerObjectsToReplace = [window, document, document.body, findCanvas()];
+    if (emtimerOptions['extraDomElementsWithEventListeners']) eventListenerObjectsToReplace = eventListenerObjectsToReplace.concat(emtimerOptions['extraDomElementsWithEventListeners']);
     for(var i = 0; i < eventListenerObjectsToReplace.length; ++i) {
       replaceEventListener(eventListenerObjectsToReplace[i], eventListenerObjectsToReplace[i]);
     }
@@ -1016,7 +1017,6 @@ function referenceTestPreTick() {
     }
   }
 }
-Module['referenceTestPreTick'] = referenceTestPreTick;
 
 // Captures the whole input stream as a JavaScript formatted code.
 var recordedInputStream = 'function injectInputStream(referenceTestFrameNumber) { <br>';
@@ -1036,7 +1036,8 @@ function dumpRecordedInputStream() {
   var div = document.createElement('div');
   div.innerHTML = '<pre>'+recordedInputStream+'</pre>';
   document.body.appendChild(div);
-  (Module['canvas']||document.querySelector('canvas')).style = 'display: none';
+  var canvas = findCanvas();
+  if (canvas) canvas.style = 'display: none';
 
   enablePageScrolling();
 }
@@ -1054,8 +1055,8 @@ function applyGain(inst, desiredAudioVolume) {
 
 // Perform a nice fade-in and fade-out of audio volume.
 function manageOpenALAudioMasterVolumeForTimedemo() {
-  var fadeTime = Module['audioFadeoutTimeAtEnd'] || 90;
-  var silenceTime = Module['audioSilenceTimeAtEnd'] || 90;
+  var fadeTime = emtimerOptions['audioFadeoutTimeAtEnd'] || 90;
+  var silenceTime = emtimerOptions['audioSilenceTimeAtEnd'] || 90;
   // Only fade out for now.
   if (referenceTestFrameNumber < numFramesToRender-fadeTime-silenceTime) return;
 
@@ -1164,10 +1165,10 @@ function referenceTestTick() {
   }
 
   if (referenceTestFrameNumber == 1) {
-    Module['timeStart'] = t1;
-    if (injectingInputStream && !Module['noRefTest']) loadReferenceImage();
+    emtimerOptions['timeStart'] = t1;
+    if (injectingInputStream && !emtimerOptions['noRefTest']) loadReferenceImage();
 
-    top.postMessage({ msg: 'startGame', key: Module.key }, '*');
+    top.postMessage({ msg: 'startGame', key: emtimerOptions.key }, '*');
   }
   if (injectingInputStream) {
     if (typeof injectInputStream !== 'undefined') {
@@ -1186,7 +1187,6 @@ function referenceTestTick() {
   // We will assume that after the reftest tick, the application is running idle to wait for next event.
   previousEventHandlerExitedTime = performance.realNow();
 }
-Module['referenceTestTick'] = referenceTestTick;
 
 // This function is called when the initial loading (main()) has completed, and the game is about to start
 // ticking its requestAnimationFrame() loop
@@ -1198,11 +1198,11 @@ function onRuntimeInitialized() {
   if (typeof cpuprofiler_add_hooks !== 'undefined' && location.search.indexOf('cpuprofiler') != -1) cpuprofiler_add_hooks();
 }
 
-Module['onRuntimeInitialized'] = onRuntimeInitialized;
+emtimerOptions['onRuntimeInitialized'] = onRuntimeInitialized;
 
 // Maps mouse coordinate from canvas CSS pixels to normalized [0,1] range. In y coordinate y grows downwards.
 function computeNormalizedCanvasPos(e) {
-  var canvas = Module['canvas'] || document.querySelector('canvas');
+  var canvas = findCanvas();
   var rect = canvas.getBoundingClientRect();
   var x = e.clientX - rect.left;
   var y = e.clientY - rect.top;
@@ -1214,7 +1214,7 @@ function computeNormalizedCanvasPos(e) {
 }
 
 function captureInputHandlers() {
-  var c = Module['canvas'] || document.querySelector('canvas');
+  var c = findCanvas();
   if (!c) {
     return (typeof realSetTimeout !== 'undefined'?realSetTimeout:setTimeout)(captureInputHandlers, 0);
   }
@@ -1292,14 +1292,14 @@ if (injectingInputStream || recordingInputStream) {
 function noOpWebGL(glCtx) {
   if (!glCtx) {
     glCtx = (function detectWebGLContext() {
-      if (Module['canvas'] && Module['canvas'].GLctxObject && Module['canvas'].GLctxObject.GLctx) return Module['canvas'].GLctxObject.GLctx;
+      if (typeof Module !== 'undefined' && Module['canvas'] && Module['canvas'].GLctxObject && Module['canvas'].GLctxObject.GLctx) return Module['canvas'].GLctxObject.GLctx;
       else if (typeof GLctx !== 'undefined') return GLctx;
-      else if (Module.ctx) return Module.ctx;
+      else if (typeof Module !== 'undefined' && Module.ctx) return Module.ctx;
       else {
-        var canvas = document.querySelector('canvas');
+        var canvas = findCanvas();
         if (canvas && canvas.GLctxObject && canvas.GLctxObject.GLctx) return canvas.GLctxObject.GLctx;
       }
-      return null;
+      return document.querySelector('canvas').getContext('webgl');
     })();
   }
   console.log('Nopping out hot GL function calls.');
