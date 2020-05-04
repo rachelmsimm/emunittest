@@ -1,0 +1,36 @@
+To make a DOTS/Tiny Unity web build compatible with emunittest harness:
+-----------------------------------------------------------------------
+
+1. Copy the exported web build into a subdirectory, say my_webgl_game/
+2. Manually edit my_webgl_game/my_webgl_game.html to adjust the game HTML file to be compatible with emunittest. Find the location of the *first* <script> tag in the file, and before that <script> element, add in the following four script lines:
+
+    <script src='../cpuprofiler.js'></script>
+    <script>var emtimerOptions = { numFramesToRender: 500 }; </script>
+    <script src="../emtimer.js"></script>
+    <script src="inputstream.js"></script>
+
+3. Customize 'numFramesToRender' field above to choose the length of the demo, in # of frames.
+
+4. Edit emunittest's index.html to add a new entry in the 'var tests = [..]' list, e.g.
+
+var tests = [
+  ...
+{ name: "My WebGL game", key: 'my_webgl_game', url: "my_webgl_game/index.html", size: 0, heap: 0, compiler: '', engine: '', date: '', apis: [''], noVsync: true, interactive: true, mobile: true },
+  ...
+];
+
+You may populate any fields in the above entry, they will be shown in the UI for visual posterity.
+
+After these steps, the new demo is now compatible to run in emunittest suite.
+
+To record a keyboard+mouse input stream for a demo:
+---------------------------------------------------
+
+This step is only needed if you need to get keyboard or mouse input into the built page. If the page is good to go without injected interaction, this step can be skipped.
+
+1. Start the emunittest server, and navigate to http://localhost:6932/my_webgl_game/index.html?record
+2. Play the game, recording keyboard and mouse events
+3. Once the specified number of frames has elapsed, the game canvas will disappear, and the recorded input stream function will appear on the page.
+   Copy-paste these contents to a new file emunittest/my_webgl_game/inputstream.js
+
+After creating the inputstream.js file, the keyboard and mouse input should now play back automatically when the test is run via the test harness.

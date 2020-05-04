@@ -1,7 +1,9 @@
 // emtimer.js, emunittest testing harness script.
 // This script makes rAF() animation runs deterministic, useful replaying identical runs for benchmarking.
 
-var emtimerOptions = typeof emtimerOptions !== 'undefined' ? emtimerOptions : (typeof Module !== 'undefined' ? Module : {});
+var emtimerOptions = (typeof emtimerOptions !== 'undefined') ? emtimerOptions : (typeof Module !== 'undefined' ? Module : {});
+
+var enableCpuProfiler = (location.search.indexOf('cpuprofiler') != -1);
 
 // If an error occurs on the page, fast-quit execution and return to harness with an error.
 window.onerror = function(msg, url, line, column, e) {
@@ -64,7 +66,7 @@ emtimerOptions['disableAudio'] = disableAudio;
 
 // In test mode (injectingInputStream == true), we always render this many fixed frames, after which the test is considered finished.
 // ?numframes=number GET parameter can override custom test length.
-var numFramesToRender = emtimerOptions['overrideNumFramesToRender'] > 0 ? emtimerOptions['overrideNumFramesToRender'] : 2000;
+var numFramesToRender = emtimerOptions['overrideNumFramesToRender'] || emtimerOptions['numFramesToRender'] || 2000;
 
 if (location.search.indexOf('numframes=') != -1) {
   numFramesToRender = parseInt(location.search.substring(location.search.indexOf('numframes=') + 'numframes='.length));
@@ -87,7 +89,7 @@ var accumulatedCpuTime = 0;
 var fakedTime = 0;
 
 // Tracks when Emscripten runtime has been loaded up. (main() called)
-var runtimeInitialized = 0;
+var emtimerRuntimeInitialized = 0;
 
 // Keeps track of performance stutter events. A stutter event occurs when there is a hiccup in subsequent per-frame times. (fast followed by slow)
 var numStutterEvents = 0;
@@ -459,7 +461,7 @@ function preloadXHR(url, responseType, onload, startupBlocker) {
   });
 }
 
-if (!emtimerOptions['providesRafIntegration']) {
+if (!emtimerOptions['providesRafIntegration'] || enableCpuProfiler) {
   if (!window.realRequestAnimationFrame) {
     window.realRequestAnimationFrame = window.requestAnimationFrame;
     window.requestAnimationFrame = function(cb) {
@@ -598,10 +600,10 @@ function loadReferenceImage() {
   img.crossOrigin = 'Anonymous'; 
   img.onload = function() {
     var canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth * window.devicePixelRatio;
-    canvas.height = img.naturalHeight * window.devicePixelRatio;
-    canvas.style.width = img.naturalWidth + 'px';
-    canvas.style.height = img.naturalHeight + 'px';
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    canvas.style.width = (img.naturalWidth / window.devicePixelRatio) + 'px';
+    canvas.style.height = (img.naturalHeight / window.devicePixelRatio) + 'px';
     var ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
     emtimerOptions['referenceImageData'] = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
@@ -670,7 +672,7 @@ function doReferenceTest() {
       var fakegl = (location.search.indexOf('fakegl') != -1);
 
       var wrong = 0;
-      if (!emtimerOptions['noRefTest'] && !fakegl) {
+      if (emtimerOptions['refTest'] && !fakegl) {
         var img = emtimerOptions['referenceImage'];
         img.style.width = actualImage.width + 'px';
         img.style.height = actualImage.height + 'px';
@@ -1126,7 +1128,7 @@ function referenceTestTick() {
   if (referenceTestPreTickCalledCount > 0)
     return; // We are being called recursively, so ignore this call.
 
-  if (!runtimeInitialized) return;
+  if (!emtimerRuntimeInitialized) return;
 
   ensureNoClientHandlers();
 
@@ -1175,7 +1177,7 @@ function referenceTestTick() {
 
   if (referenceTestFrameNumber == 1) {
     emtimerOptions['timeStart'] = t1;
-    if (injectingInputStream && !emtimerOptions['noRefTest']) loadReferenceImage();
+    if (injectingInputStream && emtimerOptions['refTest']) loadReferenceImage();
 
     top.postMessage({ msg: 'startGame', key: emtimerOptions.key }, '*');
   }
@@ -1200,11 +1202,11 @@ function referenceTestTick() {
 // This function is called when the initial loading (main()) has completed, and the game is about to start
 // ticking its requestAnimationFrame() loop
 function onRuntimeInitialized() {
-  if (runtimeInitialized) return;
+  if (emtimerRuntimeInitialized) return;
   fakedTime = 0;
   referenceTestFrameNumber = 0;
-  runtimeInitialized = 1;
-  if (typeof cpuprofiler_add_hooks !== 'undefined' && location.search.indexOf('cpuprofiler') != -1) cpuprofiler_add_hooks();
+  emtimerRuntimeInitialized = 1;
+  if (typeof cpuprofiler_add_hooks !== 'undefined' && enableCpuProfiler) cpuprofiler_add_hooks();
 }
 
 emtimerOptions['onRuntimeInitialized'] = onRuntimeInitialized;
