@@ -241,7 +241,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
       'runUuid': currentlyRunningTest.runUuid,
       'runOrdinal': allTestResultsByKey[test.key] ? (allTestResultsByKey[test.key].length + 1) : 1
     };
-    if (browserInfo.nativeSystemInfo && browserInfo.nativeSystemInfo.uuid) data.hardwareUuid = browserInfo.nativeSystemInfo.uuid;
+    if (browserInfo && browserInfo.nativeSystemInfo && browserInfo.nativeSystemInfo.uuid) data.hardwareUuid = browserInfo.nativeSystemInfo.uuid;
     resultsServer_StoreTestStart(data);
     // If chaining parallel and sequential torture modes, uncheck the parallel torture mode checkbox icon so that the new tests don't multiply when finished!
     if (document.getElementById('tortureMode').checked) document.getElementById('parallelTortureMode').checked = false;
@@ -476,7 +476,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     testResults.name = currentlyRunningTest.name;
     testResults.totalTime = (new Date() - currentlyRunningTest.startTime);
     testResults.runUuid = currentlyRunningTest.runUuid;
-    if (browserInfo.nativeSystemInfo && browserInfo.nativeSystemInfo.uuid) testResults.hardwareUuid = browserInfo.nativeSystemInfo.uuid;
+    if (browserInfo && browserInfo.nativeSystemInfo && browserInfo.nativeSystemInfo.uuid) testResults.hardwareUuid = browserInfo.nativeSystemInfo.uuid;
     testResults.runOrdinal = allTestResultsByKey[testResults.key] ? (allTestResultsByKey[testResults.key].length + 1) : 1;
     resultsServer_StoreTestResults(testResults);
 
