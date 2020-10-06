@@ -213,21 +213,26 @@ def download_and_unzip(url, dest_dir, download_even_if_exists=False):
   os.remove(received_download_target)
 
 def main():
-  download_and_unzip('http://clb.confined.space/emunittest_unity/BoatAttack_20190722_175007_wasm_release_profiling.zip', os.path.join(ROOT, 'BoatAttack_20190722_175007_wasm_release_profiling'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/kart-template_20190725_130858_wasm_release_profiling.zip', os.path.join(ROOT, 'kart-template_20190725_130858_wasm_release_profiling'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/LWRPTemplate_20190919_204458_wasm_release_profiling.zip', os.path.join(ROOT, 'LWRPTemplate_20190919_204458_wasm_release_profiling'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/microgame-fps_20190922_131915_wasm_release_profiling.zip', os.path.join(ROOT, 'microgame-fps_20190922_131915_wasm_release_profiling'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/RubysAdventure_20190722_201255_wasm_release_profiling.zip', os.path.join(ROOT, 'RubysAdventure_20190722_201255_wasm_release_profiling'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/TheExplorer_20190723_140034_wasm_release_profiling.zip', os.path.join(ROOT, 'TheExplorer_20190723_140034_wasm_release_profiling'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/Tanks_20191004_152744_wasm_release_profiling.zip', os.path.join(ROOT, 'Tanks_20191004_152744_wasm_release_profiling'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/LostCrypt_20191220_131436_wasm_release.zip', os.path.join(ROOT, 'LostCrypt_20191220_131436_wasm_release'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/TinyRacing-Wasm-Release-2019-12-12.zip', os.path.join(ROOT, 'TinyRacing-Wasm-Release-2019-12-12'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/TinyRacing-Wasm-Release-2020-01-24.zip', os.path.join(ROOT, 'TinyRacing-Wasm-Release-2020-01-24'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/Tiny3D-Wasm-Release-2020-03-01.zip', os.path.join(ROOT, 'Tiny3D-Wasm-Release-2020-03-01'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/fastcomp-tinyracing-asmjs-release-2020-03-17.zip', os.path.join(ROOT, 'fastcomp-tinyracing-asmjs-release-2020-03-17.zip'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/fastcomp-tinyracing-wasm-release-2020-03-17.zip', os.path.join(ROOT, 'fastcomp-tinyracing-wasm-release-2020-03-17'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/llvm-tinyracing-asmjs-release-closure-2020-03-17.zip', os.path.join(ROOT, 'llvm-tinyracing-asmjs-release-closure-2020-03-17'))
-  download_and_unzip('http://clb.confined.space/emunittest_unity/llvm-tinyracing-wasm-release-2020-03-17.zip', os.path.join(ROOT, 'llvm-tinyracing-wasm-release-2020-03-17'))
+  tests = [
+    'BoatAttack_20190722_175007_wasm_release_profiling',
+    'kart-template_20190725_130858_wasm_release_profiling',
+    'LWRPTemplate_20190919_204458_wasm_release_profiling',
+    'microgame-fps_20190922_131915_wasm_release_profiling',
+    'RubysAdventure_20190722_201255_wasm_release_profiling',
+    'TheExplorer_20190723_140034_wasm_release_profiling',
+    'Tanks_20191004_152744_wasm_release_profiling',
+    'LostCrypt_20191220_131436_wasm_release',
+    'TinyRacing-Wasm-Release-2019-12-12',
+    'TinyRacing-Wasm-Release-2020-01-24',
+    'Tiny3D-Wasm-Release-2020-03-01',
+    'fastcomp-tinyracing-asmjs-release-2020-03-17',
+    'fastcomp-tinyracing-wasm-release-2020-03-17',
+    'llvm-tinyracing-asmjs-release-closure-2020-03-17',
+    'llvm-tinyracing-wasm-release-2020-03-17',
+    'Tiny3D-ClassicUnity-2020-04-20'
+  ];
+  for t in tests:
+    download_and_unzip('http://clb.confined.space/emunittest_unity/' + t + '.zip', os.path.join(ROOT, t))
 
 if __name__ == '__main__':
   sys.exit(main())
