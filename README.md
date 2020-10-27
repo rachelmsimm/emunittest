@@ -56,7 +56,7 @@ Then navigate to `http://localhost:6932/` to visit the launcher.
 
 There are three main ways to run:
 
-1. Run the full suite by clicking on `Run tests` button in the launcher.
+1. Run the full suite by clicking on `Run tests` button in the launcher. **Be sure to allow popups to help the tests to run through**
 2. Run a single test by clicking on `Test` to the right side of the test name.
 3. Run a single demo in interactive mode by clicking on `Launch` button next to a test. In this mode the content runs unmodified to the original build from Unity.
 
