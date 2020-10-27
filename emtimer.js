@@ -880,6 +880,7 @@ function simulateMouseEvent(eventType, x, y, button) {
             shiftKey: e.shiftKey,
             sourceCapabilities: e.sourceCapabilities,
             timeStamp: performance.now(),
+            target: canvas,
             type: e.type,
             view: e.view,
             which: e.which,

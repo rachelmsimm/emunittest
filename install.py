@@ -229,7 +229,9 @@ def main():
     'fastcomp-tinyracing-wasm-release-2020-03-17',
     'llvm-tinyracing-asmjs-release-closure-2020-03-17',
     'llvm-tinyracing-wasm-release-2020-03-17',
-    'Tiny3D-ClassicUnity-2020-04-20'
+    'Tiny3D-ClassicUnity-2020-04-20',
+    'Skelebuddies-Wasm2JS-Release-2020-10-26-profiling',
+    'Skelebuddies-Wasm-Release-2020-10-26-profiling'
   ];
   for t in tests:
     download_and_unzip('http://clb.confined.space/emunittest_unity/' + t + '.zip', os.path.join(ROOT, t))
