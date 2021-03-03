@@ -627,8 +627,12 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var systemInfo = new XMLHttpRequest();
         systemInfo.onreadystatechange = function() {
           if (systemInfo.readyState != 4) return;
-          var nativeSystemInfo = JSON.parse(systemInfo.responseText);
-          resolve(nativeSystemInfo);
+          try {
+            var nativeSystemInfo = JSON.parse(systemInfo.responseText);
+            resolve(nativeSystemInfo);
+          } catch(e) {
+            resolve({});
+          }
         }
         systemInfo.open("POST", "system_info", true);
         systemInfo.send();
