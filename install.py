@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from __future__ import print_function
 
 import copy, errno, json, multiprocessing, os, os.path, platform, re, shutil, stat, subprocess, sys, tempfile, zipfile
@@ -231,10 +232,12 @@ def main():
     'llvm-tinyracing-wasm-release-2020-03-17',
     'Tiny3D-ClassicUnity-2020-04-20',
     'Skelebuddies-Wasm2JS-Release-2020-10-26-profiling',
-    'Skelebuddies-Wasm-Release-2020-10-26-profiling'
+    'Skelebuddies-Wasm-Release-2020-10-26-profiling',
+    'com.unity.template.kart_20210304_144749_wasm_release_profiling',
+    'com.unity.template.kart_20210305_102729_wasm_release_profiling'
   ];
   for t in tests:
-    download_and_unzip('http://clb.confined.space/emunittest_unity/' + t + '.zip', os.path.join(ROOT, t))
+    download_and_unzip('http://clb.confined.space/emunittest_unity/' + t + '.zip', os.path.join(ROOT, 'demos', t))
 
 if __name__ == '__main__':
   sys.exit(main())
