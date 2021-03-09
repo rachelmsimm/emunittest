@@ -234,7 +234,9 @@ def main():
     'Skelebuddies-Wasm2JS-Release-2020-10-26-profiling',
     'Skelebuddies-Wasm-Release-2020-10-26-profiling',
     'com.unity.template.kart_20210304_144749_wasm_release_profiling',
-    'com.unity.template.kart_20210305_102729_wasm_release_profiling'
+    'com.unity.template.kart_20210305_102729_wasm_release_profiling',
+    'BoatAttack_2020.2.4',
+    'BoatAttack_2021.2'
   ];
   for t in tests:
     download_and_unzip('http://clb.confined.space/emunittest_unity/' + t + '.zip', os.path.join(ROOT, 'demos', t))
