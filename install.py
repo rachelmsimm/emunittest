@@ -239,6 +239,11 @@ def main():
     'BoatAttack_2021.2'
   ];
   for t in tests:
+    # Remove old installed tests from root directory (if any existed using the old structure)
+    if os.path.isdir(os.path.join(ROOT, t)):
+      shutil.rmtree(os.path.join(ROOT, t))
+
+    # Install new tests to demos/ directory
     download_and_unzip('http://clb.confined.space/emunittest_unity/' + t + '.zip', os.path.join(ROOT, 'demos', t))
 
 if __name__ == '__main__':
