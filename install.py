@@ -236,7 +236,8 @@ def main():
     'com.unity.template.kart_20210304_144749_wasm_release_profiling',
     'com.unity.template.kart_20210305_102729_wasm_release_profiling',
     'BoatAttack_2020.2.4',
-    'BoatAttack_2021.2'
+    'BoatAttack_2021.2',
+    'Dragon Crashers_20210429_121455_wasm_release_profiling'
   ];
   for t in tests:
     # Remove old installed tests from root directory (if any existed using the old structure)
