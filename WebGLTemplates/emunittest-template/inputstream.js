@@ -1,0 +1,2 @@
+function injectInputStream(referenceTestFrameNumber) {
+}
