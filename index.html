@@ -5,13 +5,14 @@
 <style>
 table { border-spacing: 0; border-collapse: collapse;}
 td { padding: 2px; padding-right: 10px; margin: 0px;}
+.hidden { display: none; }
 </style>
 </head>
 <body style="font-family: jaf-bernino-sans, \'Lucida Grande\', \'Lucida Sans Unicode\', \'Lucida Sans\', Geneva, Verdana, sans-serif;">
   <h2 id='version'>Emunittest 1.0</h2>
   This suite contains different web games repurposed as browser benchmarks.
-  <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='info_icon.png'><b>System Information:</b>
-  <div id='system_information' onclick="selectText('system_information')"><pre>Measuring...</pre></div>
+  <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='info_icon.png' alt="Show System Information"><b>System Information </b><button id="show-system-information" onclick="toggleVisible('show-system-information', 'system_information')">Show</button>
+  <div id='system_information' class="hidden" onclick="selectText('system_information')"><pre>Measuring...</pre></div>
   <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='info_icon.png'><b>How to Run:</b>
   <div>
     <ul>
@@ -518,6 +519,21 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         range.selectNodeContents(text);
         selection.removeAllRanges();
         selection.addRange(range);
+    }
+  }
+  /**
+   * Toggle visibility of an element
+   */
+  function toggleVisible(buttionId, id) {
+    var button = document.getElementById(buttionId);
+    var element = document.getElementById(id);
+
+    if (element.classList.contains("hidden")) {
+      button.textContent = "Hide";
+      element.classList.remove("hidden");
+    } else {
+      button.textContent = "Show";
+      element.classList.add("hidden");
     }
   }
   </script>
