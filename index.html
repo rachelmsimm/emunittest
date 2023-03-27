@@ -10,8 +10,9 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
 <body style="font-family: jaf-bernino-sans, \'Lucida Grande\', \'Lucida Sans Unicode\', \'Lucida Sans\', Geneva, Verdana, sans-serif;">
   <h2 id='version'>Emunittest 1.0</h2>
   This suite contains different web games repurposed as browser benchmarks.
-  <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='./img/info_icon.png'><b>System Information:</b>
-  <div id='system_information' onclick="selectText('system_information')"><pre>Measuring...</pre></div>
+  <div onclick="toggleSystemInfo('system_information')"><p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='./img/info_icon.png'><b>System Information:</b>
+  </div>
+  <div style='display: none' id='system_information' onclick="selectText('system_information')"><pre>Measuring...</pre></div>
   <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='./img/info_icon.png'><b>How to Run:</b>
   <div>
     <ul>
@@ -484,6 +485,11 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
   }
   window.addEventListener("message", receiveMessage, false);
 
+  function toggleSystemInfo(element)
+  {
+    var ele = document.getElementById(element);
+    ele.style.display = (ele.style.display === 'none' ? 'block' : 'none');
+  }
   // http://stackoverflow.com/questions/985272/selecting-text-in-an-element-akin-to-highlighting-with-your-mouse
   function selectText(element) {
     var doc = document, text = doc.getElementById(element), range, selection;
