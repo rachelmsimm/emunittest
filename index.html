@@ -65,9 +65,9 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
       navigator.hardwareConcurrency = 1;
     }
   </script>
-  <script src='core-estimator/core-estimator.min.js'></script>
-  <script src='featuretest.js'></script>
-  <script src='resultsServer.js'></script>
+  <script src='./lib/js/core-estimator/core-estimator.min.js'></script>
+  <script src='./lib/js/featuretest.js'></script>
+  <script src='./lib/js/resultsServer.js'></script>
   <script>
 
   var browserInfo = null;
@@ -76,6 +76,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
   var allTestResultsByKey = {};
 
   var tests = [
+    { name: "Ready Set Cook", key: 'ReadySetCook', url: 'demos/ReadySetCook3/?nofbinstant&room=999&playerId=2&name=P2', size: 7098749, heap: 112*1024*1024, compiler: 'Emscripten 1.39.17 LLVM Wasm backend', engine: 'DOTS/Tiny 0.29 (Unity 2020.1.9f1)', date: '2020-10-26', apis: ['WebGL 2', 'WebGL 1', 'WebAssembly'], noVsync: true, interactive: true, mobile: true},
     { name: "Skelebuddies wasm", key: 'Skelebuddies_wasm_2020_10', url: 'demos/Skelebuddies-Wasm-Release-2020-10-26-profiling/Skelebuddies.html', size: 7098749, heap: 112*1024*1024, compiler: 'Emscripten 1.39.17 LLVM Wasm backend', engine: 'DOTS/Tiny 0.29 (Unity 2020.1.9f1)', date: '2020-10-26', apis: ['WebGL 2', 'WebGL 1', 'WebAssembly'], noVsync: true, interactive: true, mobile: true},
     { name: "Skelebuddies wasm2js", key: 'Skelebuddies_wasm2js_2020_10', url: 'demos/Skelebuddies-Wasm2JS-Release-2020-10-26-profiling/Skelebuddies.html', size: 18137088, heap: 112*1024*1024, compiler: 'Emscripten 1.39.17 LLVM Wasm backend', engine: 'DOTS/Tiny 0.29 (Unity 2020.1.9f1)', date: '2020-10-26', apis: ['WebGL 2', 'WebGL 1', 'WebAssembly'], noVsync: true, interactive: true, mobile: true},
     { name: "Tiny3D Unity Classic", key: 'Tiny3D-Unity-Classic', url: "demos/Tiny3D-ClassicUnity-2020-04-20/index.html", size: 0, heap: 0, compiler: '', engine: '', date: '2020-04-20', apis: ['WebGL 2', 'WebAssembly'], noVsync: true, interactive: true, mobile: true },
@@ -99,7 +100,6 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     { name: "Microgame - Kart 2020.2.4", key: 'microgame_kart_2020.2.4', url: "demos/com.unity.template.kart_20210304_144749_wasm_release_profiling/index.html", size: 43.6*1024*1024, heap: 166*1024*1024, compiler: '', engine: 'Unity 2020.2.4', date: '2021-03-04', apis: ['wasm', 'WebGL 2', 'WebAudio'], noVsync: true, interactive: true, mobile: true },
     { name: "Microgame - Kart 2021.2", key: 'microgame_kart_2021.2', url: "demos/com.unity.template.kart_20210305_102729_wasm_release_profiling/index.html", size: 43*1024*1024, heap: 102*1024*1024, compiler: '', engine: 'Unity 2021.2', date: '2021-03-05', apis: ['wasm', 'WebGL 2', 'WebAudio'], noVsync: true, interactive: true, mobile: true },
     { name: "Dragon Crashers - 2020.3.5f1", key: 'dragon_crashers.2020.3', url: "demos/Dragon Crashers_20210429_121455_wasm_release_profiling/index.html", size: 89.8*1024*1024, heap: 500.3*1024*1024, compiler: '', engine: 'Unity 2020.3', date: '2021-04-29', apis: ['wasm', 'WebGL 2', 'WebAudio'], noVsync: true, interactive: true, mobile: true }
-
   ];
 
   // If running on a mobile browser, filter out showing the tests that can't be run on a mobile browser.
