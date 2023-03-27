@@ -1,0 +1,19 @@
+{
+    "demos":[
+        {
+            "name": "BoatAttack 2020.2.4",
+            "key": "BoatAttack_2020.2.4",
+            "url": "demos/BoatAttack_2020.2.4/index.html",
+            "editor_version": "2020.2.4",
+            "size": 136,
+            "heap": 387,
+            "compiler": "",
+            "engine": "Unity 2020.2.4",
+            "apis": ["wasm", "URP", "WebGL 2", "linear-color-space"],
+            "noVsync": true,
+            "interactive": true,
+            "mobile": true,
+            "date": "2021-03-09"
+        }
+    ]
+}
