@@ -5,15 +5,15 @@
 <style>
 table { border-spacing: 0; border-collapse: collapse;}
 td { padding: 2px; padding-right: 10px; margin: 0px;}
+.hidden { display: none; }
 </style>
 </head>
 <body style="font-family: jaf-bernino-sans, \'Lucida Grande\', \'Lucida Sans Unicode\', \'Lucida Sans\', Geneva, Verdana, sans-serif;">
   <h2 id='version'>Emunittest 1.0</h2>
   This suite contains different web games repurposed as browser benchmarks.
-  <div onclick="toggleSystemInfo('system_information')"><p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='./img/info_icon.png'><b>System Information:</b>
-  </div>
-  <div style='display: none' id='system_information' onclick="selectText('system_information')"><pre>Measuring...</pre></div>
-  <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='./img/info_icon.png'><b>How to Run:</b>
+  <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='info_icon.png' alt="Show System Information"><b>System Information </b><button id="show-system-information" onclick="toggleVisible('show-system-information', 'system_information')">Show</button>
+  <div id='system_information' class="hidden" onclick="selectText('system_information')"><pre>Measuring...</pre></div>
+  <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='info_icon.png'><b>How to Run:</b>
   <div>
     <ul>
       <li>Each test runs for a fixed number of frames (typically 2000), and at the end, the timescore is measured and GL output of the final frame verified against a reference image.
@@ -483,12 +483,6 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     }
   }
   window.addEventListener("message", receiveMessage, false);
-
-  function toggleSystemInfo(element)
-  {
-    var ele = document.getElementById(element);
-    ele.style.display = (ele.style.display === 'none' ? 'block' : 'none');
-  }
   // http://stackoverflow.com/questions/985272/selecting-text-in-an-element-akin-to-highlighting-with-your-mouse
   function selectText(element) {
     var doc = document, text = doc.getElementById(element), range, selection;
@@ -502,6 +496,21 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         range.selectNodeContents(text);
         selection.removeAllRanges();
         selection.addRange(range);
+    }
+  }
+  /**
+   * Toggle visibility of an element
+   */
+  function toggleVisible(buttionId, id) {
+    var button = document.getElementById(buttionId);
+    var element = document.getElementById(id);
+
+    if (element.classList.contains("hidden")) {
+      button.textContent = "Hide";
+      element.classList.remove("hidden");
+    } else {
+      button.textContent = "Show";
+      element.classList.add("hidden");
     }
   }
   </script>
