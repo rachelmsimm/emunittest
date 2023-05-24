@@ -4,11 +4,11 @@ from __future__ import print_function
 import copy, errno, json, multiprocessing, os, os.path, platform, re, shutil, stat, subprocess, sys, tempfile, zipfile
 
 if sys.version_info >= (3,):
-  from urllib.parse import urljoin
+  from urllib.parse import quote
   from urllib.request import urlopen
   import functools
 else:
-  from urlparse import urljoin
+  from urllib import quote
   from urllib2 import urlopen
 
 ROOT = os.path.dirname(os.path.realpath(__file__))
@@ -238,14 +238,15 @@ def main():
     'BoatAttack_2020.2.4',
     'BoatAttack_2021.2',
     'Dragon Crashers_20210429_121455_wasm_release_profiling'
-  ];
+  ]
   for t in tests:
     # Remove old installed tests from root directory (if any existed using the old structure)
     if os.path.isdir(os.path.join(ROOT, t)):
       shutil.rmtree(os.path.join(ROOT, t))
 
     # Install new tests to demos/ directory
-    download_and_unzip('http://clb.confined.space/emunittest_unity/' + t + '.zip', os.path.join(ROOT, 'demos', t))
+    url = f'http://clb.confined.space/emunittest_unity/{quote(t)}.zip'
+    download_and_unzip(url, os.path.join(ROOT, 'demos', t))
 
 if __name__ == '__main__':
   sys.exit(main())
