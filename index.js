@@ -1,3 +1,9 @@
+let {
+  emrun_exit,
+  emrun_print,
+  emrun_printErr,
+} = window;
+
 if (location.search.toLowerCase().indexOf('numtimes=') != -1) {
   var numTimesToRunEachTest = parseInt(location.search.substring(location.search.toLowerCase().indexOf('numtimes=') + 'numtimes='.length));
   document.getElementById('numTimesToRunEachTest').value = numTimesToRunEachTest;
