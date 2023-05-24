@@ -11,7 +11,6 @@ if (location.search.toLowerCase().indexOf('nocpuprofiler') != -1 || location.sea
 document.getElementById('tortureMode').checked = (location.search.toLowerCase().indexOf('torturemode') != -1);
 document.getElementById('parallelTortureMode').checked = (location.search.toLowerCase().indexOf('paralleltorturemode') != -1);
 
-var supportsNavigatorHardwareConcurrency = navigator.hardwareConcurrency;
 navigator.hardwareConcurrency = 1; // Currently disable core estimator altogether, because of https://github.com/oftn/core-estimator/issues/8.
 
 if (navigator.userAgent.indexOf('Trident') != -1) {
