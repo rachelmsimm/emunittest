@@ -11,13 +11,6 @@ if (location.search.toLowerCase().indexOf('nocpuprofiler') != -1 || location.sea
 document.getElementById('tortureMode').checked = (location.search.toLowerCase().indexOf('torturemode') != -1);
 document.getElementById('parallelTortureMode').checked = (location.search.toLowerCase().indexOf('paralleltorturemode') != -1);
 
-navigator.hardwareConcurrency = 1; // Currently disable core estimator altogether, because of https://github.com/oftn/core-estimator/issues/8.
-
-if (navigator.userAgent.indexOf('Trident') != -1) {
-  // IE11 hangs to core estimator
-  navigator.hardwareConcurrency = 1;
-}
-
 var browserInfo = null;
 
 // Aggregates all test results by test name, e.g. allTestResultsByKey['angrybots'] is an array containing results of each run of that demo.
