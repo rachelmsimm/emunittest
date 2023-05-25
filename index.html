@@ -11,8 +11,8 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
 <body style="font-family: jaf-bernino-sans, \'Lucida Grande\', \'Lucida Sans Unicode\', \'Lucida Sans\', Geneva, Verdana, sans-serif;">
   <h2 id='version'>Emunittest 1.0</h2>
   This suite contains different web games repurposed as browser benchmarks.
-  <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='info_icon.png' alt="Show System Information"><b>System Information </b><button id="show-system-information" onclick="toggleVisible('show-system-information', 'system_information')">Show</button>
-  <div id='system_information' class="hidden" onclick="selectText('system_information')"><pre>Measuring...</pre></div>
+  <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='info_icon.png' alt="Show System Information"><b>System Information </b><button id="show-system-information">Show</button>
+  <div id='system_information' class="hidden"><pre>Measuring...</pre></div>
   <p style='margin-bottom: 0px;'><img style='width: 24px; height: auto; vertical-align: text-top;' src='info_icon.png'><b>How to Run:</b>
   <div>
     <ul>
@@ -26,7 +26,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
 
   <b>Tests:</b>
   <div style='margin-left: 30px; margin-bottom: 5px;' id='tests'></div>
-  <button onclick="toggleAllOrNoneTests()" id='toggleAllOrNoneTests'>Select None</button>
+  <button id='toggleAllOrNoneTests'>Select None</button>
   <span id='numTestsSelected'>No tests selected.</span>
   <div style='margin-top: 20px;'><b>Options:</b>
   <div style='margin-left: 30px; margin-bottom: 30px; '>
@@ -36,16 +36,16 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     <input type='checkbox' name='cpuProfiler' id='cpuProfiler' /><label for='cpuProfiler'>Show CPU profiler</label><br>
     <input type='checkbox' name='webglProfiler' id='webglProfiler' /><label for='webglProfiler'>Trace WebGL execution time (requires CPU profiler to also be enabled for this to work)</label><br>
     <input type='checkbox' name='tortureMode' id='tortureMode' /><label for='tortureMode'>Sequential torture mode: immediately starts the selected test(s) again from the beginning after finishing</label><br>
-    <input type='checkbox' name='parallelTortureMode' id='parallelTortureMode' onclick='updateNumParallelWindowsEnabled();' /><label for='parallelTortureMode' onclick='updateNumParallelWindowsEnabled();'>Parallel torture mode: runs multiple instances of the same test (Best run in conjunction with disable vsync option. Chain with sequential torture mode for added effect)</label><br>
+    <input type='checkbox' name='parallelTortureMode' id='parallelTortureMode'/><label for='parallelTortureMode' id='parallelTortureModeLabel'>Parallel torture mode: runs multiple instances of the same test (Best run in conjunction with disable vsync option. Chain with sequential torture mode for added effect)</label><br>
     <span style='margin-left: 30px'>- Number of parallel pages: <input name='numParallelWindows' id='numParallelWindows' value='3' style='width: 40px;' disabled></span>
   </div>
-  <p><button onclick="runSelectedTests()" id='runTests'>Run tests</button>
+  <p><button id='runTests'>Run tests</button>
   </div>
   <canvas id='gl' style='display:none;'></canvas>
   <br>
   <h3>Results log:</h3>
-  <div id='full_test_results' style='margin-left: 30px;' onclick="selectText('full_test_results')"><pre></pre></div>
-  <button style='margin-bottom: 200px;' onclick="selectText('full_test_results')">Select</button>
+  <div id='full_test_results' style='margin-left: 30px;'><pre></pre></div>
+  <button id='select_full_test_results' style='margin-bottom: 200px;'>Select</button>
   <script src='sha256/sha256.js'></script>
   <script src='core-estimator/core-estimator.min.js'></script>
   <script src='featuretest.js'></script>

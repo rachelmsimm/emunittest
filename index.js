@@ -4,6 +4,24 @@ let {
   emrun_printErr,
 } = window;
 
+(function createEventListeners() {
+  document.getElementById('show-system-information').addEventListener('click', () => {
+    toggleVisible('show-system-information', 'system_information');
+  });
+  document.getElementById('system_information').addEventListener('click', () => {
+    selectText('system_information');
+  });
+  document.getElementById('toggleAllOrNoneTests').addEventListener('click', toggleAllOrNoneTests);
+  document.getElementById('parallelTortureMode').addEventListener('click', updateNumParallelWindowsEnabled);
+  document.getElementById('parallelTortureModeLabel').addEventListener('click', updateNumParallelWindowsEnabled);
+  document.getElementById('runTests').addEventListener('click', runSelectedTests);
+  const selectFullTestResults = () => {
+    selectText('full_test_results');
+  };
+  document.getElementById('full_test_results').addEventListener('click', selectFullTestResults);
+  document.getElementById('select_full_test_results').addEventListener('click', selectFullTestResults);
+}());
+
 if (location.search.toLowerCase().indexOf('numtimes=') != -1) {
   var numTimesToRunEachTest = parseInt(location.search.substring(location.search.toLowerCase().indexOf('numtimes=') + 'numtimes='.length));
   document.getElementById('numTimesToRunEachTest').value = numTimesToRunEachTest;
