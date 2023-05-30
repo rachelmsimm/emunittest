@@ -23,9 +23,9 @@ diff --git a/original_index.html b/emunittest_compatible_index.html
 4. While this step is not strictly necessary, it helps with the visual HTML page layout to work better with emunittest: Edit file TemplateData/style.css and add the following lines at the end of that file:
 
 body { margin: 0; overflow: hidden; }
-html, body, .webgl-content, #gameContainer, #unityContainer, canvas { width: 100% !important; height: 100% !important; }
+html, body, #unity-canvas, #unity-container, canvas { width: 100% !important; height: 100% !important; }
 .footer { display: none; }
-.webgl-content { position: static !important; top: 0% !important left: 0% !important; -webkit-transform: translate(0%, 0%); transform: translate(0%, 0%); }
+#unity-canvas { position: static !important; top: 0% !important left: 0% !important; -webkit-transform: translate(0%, 0%); transform: translate(0%, 0%); }
 
 5. Edit emunittest's index.html to add a new entry in the 'var tests = [..]' list, e.g.
 
