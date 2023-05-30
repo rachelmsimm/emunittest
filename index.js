@@ -94,7 +94,7 @@ if (selectedTestsAtStart) {
 
     var item = '<tr style="background-color: ' + ((i % 2 == 1) ? '#F0F0F0' : '#D0D0D0') + ' ;">';
     var checked = (selectedTestsAtStart.length == 0 || selectedTestsAtStart.indexOf(t.name.toLowerCase()) != -1 || selectedTestsAtStart.indexOf(t.key.toLowerCase()) != -1) ? 'checked' : '';
-    item += `<td><input type="checkbox" class="game-select" name="${t.name}" id="${t.name}" ${checked} onclick="countAndUpdateNumTestsSelected();" /><label for="${t.name}">${t.name}</label></td>`;
+    item += `<td><input type="checkbox" class="game-select" name="${t.name}" id="${t.name}" ${checked} /><label for="${t.name}">${t.name}</label></td>`;
     item += '<td>' + t.date + '</td>';
     item += '<td id="results_' + t.id + '">Not yet run</td>';
     item += '<td style="font-size:8px; max-width:150px;">' + t.apis.join(', ') + '</td>';
@@ -106,16 +106,27 @@ if (selectedTestsAtStart) {
     item += '<td>' + Math.round(t.size/1024/1024) + ' MB' + '</td>';
     item += '<td>' + (t.heap ? Math.round(t.heap/1024/1024) + ' MB' : 'N/A') + '</td>';
     item += '<td style="text-align:center">';
-    item += `<button class="test-game-button" data-index="${t.id}" onclick="runTest(${t.id}, false)">Test</button>`;
+    item += `<button class="test-game-button" data-index="${t.id}">Test</button>`;
     item += '</td>';
     item += '<td style="text-align:center">';
-    if (t.interactive) item += `<button class="launch-game-button" data-index="${t.id}" onclick="runTest(${t.id}, true)">Launch</button>`;
+    if (t.interactive) item += `<button class="launch-game-button" data-index="${t.id}">Launch</button>`;
     item += '</td>';
     item += '</tr>'
     demos += item;
   }
   demos += '</table>';
-  document.getElementById('tests').innerHTML = demos;
+  const parentElement = document.getElementById('tests');
+  parentElement.innerHTML = demos;
+  parentElement.addEventListener('click', (e) => {
+    const element = e.target;
+    if (element.classList.contains('test-game-button')) {
+      runTest(parseInt(element.dataset.index), false);
+    } else if (element.classList.contains('launch-game-button')) {
+      runTest(parseInt(element.dataset.index), true);
+    } else if (element.classList.contains('game-select')) {
+      countAndUpdateNumTestsSelected();
+    }
+  });
   countAndUpdateNumTestsSelected();
 })();
 
