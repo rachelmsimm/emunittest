@@ -86,36 +86,39 @@ if (selectedTestsAtStart) {
   for(var i = 0; i < selectedTestsAtStart.length; ++i) selectedTestsAtStart[i] = selectedTestsAtStart[i].trim().toLowerCase();
 }
 
-var demos = '<table><tr><td><b>Name</b></td><td><b>Version</b></td><td><b>Result</b></td><td style="max-width:50px;"><b>Scope</b></td><td><b>Engine</b></td><td><b>Disk Size</b></td><td><b>Heap Size</b></td><td><b>Test</b></td><td><b>Interactive</b></td></tr>'
-for(var i = 0; i < tests.length; ++i) {
-  var t = tests[i];
-  t.id = i;
+(function createTable() {
+  var demos = '<table><tr><td><b>Name</b></td><td><b>Version</b></td><td><b>Result</b></td><td style="max-width:50px;"><b>Scope</b></td><td><b>Engine</b></td><td><b>Disk Size</b></td><td><b>Heap Size</b></td><td><b>Test</b></td><td><b>Interactive</b></td></tr>'
+  for(var i = 0; i < tests.length; ++i) {
+    var t = tests[i];
+    t.id = i;
 
-  var item = '<tr style="background-color: ' + ((i % 2 == 1) ? '#F0F0F0' : '#D0D0D0') + ' ;">';
-  var checked = (selectedTestsAtStart.length == 0 || selectedTestsAtStart.indexOf(t.name.toLowerCase()) != -1 || selectedTestsAtStart.indexOf(t.key.toLowerCase()) != -1) ? 'checked' : '';
-  item += '<td><input type="checkbox" name="' + t.name + '" id="' + t.name + '" ' + checked + ' onclick="countAndUpdateNumTestsSelected();" /><label for="' + t.name + '">' + t.name + '</label></td>';
-  item += '<td>' + t.date + '</td>';
-  item += '<td id="results_' + t.id + '">Not yet run</td>';
-  item += '<td style="font-size:8px; max-width:150px;">' + t.apis.join(', ') + '</td>';
-  item += '<td style="font-size:8px;">';
-  if (t.engine) item += t.engine;
-  if (t.engine && t.compiler) item += ', ';
-  if (t.compiler) item += t.compiler;
-  item += '</td>';
-  item += '<td>' + Math.round(t.size/1024/1024) + ' MB' + '</td>';
-  item += '<td>' + (t.heap ? Math.round(t.heap/1024/1024) + ' MB' : 'N/A') + '</td>';
-  item += '<td style="text-align:center">';
-  item += '<button onclick="runTest(' + t.id + ', false)">Test</button>';
-  item += '</td>';
-  item += '<td style="text-align:center">';
-  if (t.interactive) item += '<button onclick="runTest(' + t.id + ', true)">Launch</button>';
-  item += '</td>';
-  item += '</tr>'
-  demos += item;
-}
-demos += '</table>';
-document.getElementById('tests').innerHTML = demos;
-countAndUpdateNumTestsSelected();
+    var item = '<tr style="background-color: ' + ((i % 2 == 1) ? '#F0F0F0' : '#D0D0D0') + ' ;">';
+    var checked = (selectedTestsAtStart.length == 0 || selectedTestsAtStart.indexOf(t.name.toLowerCase()) != -1 || selectedTestsAtStart.indexOf(t.key.toLowerCase()) != -1) ? 'checked' : '';
+    item += '<td><input type="checkbox" name="' + t.name + '" id="' + t.name + '" ' + checked + ' onclick="countAndUpdateNumTestsSelected();" /><label for="' + t.name + '">' + t.name + '</label></td>';
+    item += '<td>' + t.date + '</td>';
+    item += '<td id="results_' + t.id + '">Not yet run</td>';
+    item += '<td style="font-size:8px; max-width:150px;">' + t.apis.join(', ') + '</td>';
+    item += '<td style="font-size:8px;">';
+    if (t.engine) item += t.engine;
+    if (t.engine && t.compiler) item += ', ';
+    if (t.compiler) item += t.compiler;
+    item += '</td>';
+    item += '<td>' + Math.round(t.size/1024/1024) + ' MB' + '</td>';
+    item += '<td>' + (t.heap ? Math.round(t.heap/1024/1024) + ' MB' : 'N/A') + '</td>';
+    item += '<td style="text-align:center">';
+    item += '<button onclick="runTest(' + t.id + ', false)">Test</button>';
+    item += '</td>';
+    item += '<td style="text-align:center">';
+    if (t.interactive) item += '<button onclick="runTest(' + t.id + ', true)">Launch</button>';
+    item += '</td>';
+    item += '</tr>'
+    demos += item;
+  }
+  demos += '</table>';
+  document.getElementById('tests').innerHTML = demos;
+  countAndUpdateNumTestsSelected();
+})();
+
 
 function getSelectedTests() {
   var selected = [];
