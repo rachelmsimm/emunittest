@@ -1,10 +1,12 @@
 #!/bin/sh
 
 if command -v python3 &> /dev/null; then
-    python3 emrun.py --no_browser --serve_after_close --serve_after_exit --hostname=0.0.0.0 --port 6932 .
+    PYTHON=python3
 elif command -v python &> /dev/null; then
-    python emrun.py --no_browser --serve_after_close --serve_after_exit --hostname=0.0.0.0 --port 6932 .
+    PYTHON=python
 else
     echo "No Python interpreter found."
     exit 1
 fi
+
+$PYTHON emrun.py --no_browser --serve_after_close --serve_after_exit --hostname=0.0.0.0 --port 6932 .
