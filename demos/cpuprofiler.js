@@ -344,8 +344,6 @@ var emscriptenCpuProfiler = {
     this.clearUi(0, this.canvas.width);
     this.drawGraphLabels();
     this.updateUi();
-    Module['preMainLoop'] = function cpuprofiler_frameStart() { emscriptenCpuProfiler.frameStart(); }
-    Module['postMainLoop'] = function cpuprofiler_frameEnd() { emscriptenCpuProfiler.frameEnd(); }
   },
 
   drawHorizontalLine: function drawHorizontalLine(startX, endX, pixelThickness, msecs) {
@@ -631,29 +629,41 @@ var emscriptenCpuProfiler = {
   }
 };
 
-// Hook into setInterval to be able to capture the time spent executing them.
-emscriptenCpuProfiler.createSection(2, 'setInterval', emscriptenCpuProfiler.colorSetIntervalSection, /*traceable=*/true);
-realSetInterval = setInterval;
-setInterval = function(fn, delay) {
-  function wrappedSetInterval() {
-    emscriptenCpuProfiler.enterSection(2);
-    fn();
-    emscriptenCpuProfiler.endSection(2);
-  };
-  return realSetInterval(wrappedSetInterval, delay);
-}
+if (location.search.includes('cpuprofiler')) {
+  // Hook into setInterval to be able to capture the time spent executing them.
+  emscriptenCpuProfiler.createSection(2, 'setInterval', emscriptenCpuProfiler.colorSetIntervalSection, /*traceable=*/true);
+  realSetInterval = setInterval;
+  setInterval = function(fn, delay) {
+    function wrappedSetInterval() {
+      emscriptenCpuProfiler.enterSection(2);
+      fn();
+      emscriptenCpuProfiler.endSection(2);
+    };
+    return realSetInterval(wrappedSetInterval, delay);
+  }
 
-// Hook into setTimeout to be able to capture the time spent executing them.
-emscriptenCpuProfiler.createSection(3, 'setTimeout', emscriptenCpuProfiler.colorSetTimeoutSection, /*traceable=*/true);
-realSetTimeout = setTimeout;
-setTimeout = function(fn, delay) {
-  function wrappedSetTimeout() {
-    emscriptenCpuProfiler.enterSection(3);
-    fn();
-    emscriptenCpuProfiler.endSection(3);
-  };
-  return realSetTimeout(wrappedSetTimeout, delay);
-}
+  // Hook into setTimeout to be able to capture the time spent executing them.
+  emscriptenCpuProfiler.createSection(3, 'setTimeout', emscriptenCpuProfiler.colorSetTimeoutSection, /*traceable=*/true);
+  realSetTimeout = setTimeout;
+  setTimeout = function(fn, delay) {
+    function wrappedSetTimeout() {
+      emscriptenCpuProfiler.enterSection(3);
+      fn();
+      emscriptenCpuProfiler.endSection(3);
+    };
+    return realSetTimeout(wrappedSetTimeout, delay);
+  }
 
-// Backwards compatibility with previously compiled code. Don't call this anymore!
-function cpuprofiler_add_hooks() { emscriptenCpuProfiler.initialize(); }
+  // Inject into requestAnimationFrame() for capturing rendering.
+  if (!window.cpuProfilerRAF) {
+    window.cpuProfilerRAF = window.requestAnimationFrame;
+    window.requestAnimationFrame = function(cb) {
+      function hookedCb() {
+        emscriptenCpuProfiler.frameStart();
+        cb(performance.now());
+        emscriptenCpuProfiler.frameEnd();
+      }
+      return window.cpuProfilerRAF(hookedCb);
+    }
+  }
+}

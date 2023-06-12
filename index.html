@@ -77,30 +77,19 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
   var allTestResultsByKey = {};
 
   var tests = [
-    { name: "Skelebuddies wasm", key: 'Skelebuddies_wasm_2020_10', url: 'demos/Skelebuddies-Wasm-Release-2020-10-26-profiling/Skelebuddies.html', size: 7098749, heap: 112*1024*1024, compiler: 'Emscripten 1.39.17 LLVM Wasm backend', engine: 'DOTS/Tiny 0.29 (Unity 2020.1.9f1)', date: '2020-10-26', apis: ['WebGL 2', 'WebGL 1', 'WebAssembly'], noVsync: true, interactive: true, mobile: true},
-    { name: "Skelebuddies wasm2js", key: 'Skelebuddies_wasm2js_2020_10', url: 'demos/Skelebuddies-Wasm2JS-Release-2020-10-26-profiling/Skelebuddies.html', size: 18137088, heap: 112*1024*1024, compiler: 'Emscripten 1.39.17 LLVM Wasm backend', engine: 'DOTS/Tiny 0.29 (Unity 2020.1.9f1)', date: '2020-10-26', apis: ['WebGL 2', 'WebGL 1', 'WebAssembly'], noVsync: true, interactive: true, mobile: true},
-    { name: "Tiny3D Unity Classic", key: 'Tiny3D-Unity-Classic', url: "demos/Tiny3D-ClassicUnity-2020-04-20/index.html", size: 0, heap: 0, compiler: '', engine: '', date: '2020-04-20', apis: ['WebGL 2', 'WebAssembly'], noVsync: true, interactive: true, mobile: true },
-    { name: "Tiny3D", key: 'tiny3d', url: "demos/Tiny3D-Wasm-Release-2020-03-01/Tiny3D.html", size: 1780685, heap: 64*1024*1024, compiler: '', engine: 'DOTS/Tiny 20200301', date: '2020-03-01', apis: ['WebGL 1', 'WebAssembly'], noVsync: true, interactive: true, mobile: true },
-    { name: "Lost Crypt", key: 'lostcrypt', url: "demos/LostCrypt_20191220_131436_wasm_release/index.html", size: 97430484, heap: 512*1024*1024, compiler: '', engine: 'Unity 2019.3.0f3', date: '2019-12-20', apis: ['wasm', 'WebGL 1', 'WebGL 2', 'URP 2D'], noVsync: true, interactive: true, mobile: true },
-    { name: "TinyRacing v3 wasm", key: 'tinyracingv3wasm', url: "demos/llvm-tinyracing-wasm-release-2020-03-17/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: 'DOTS/Tiny 20200318', date: '2020-03-18', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
-    { name: "TinyRacing v3 wasm2js", key: 'tinyracingv3wasm2js', url: "demos/llvm-tinyracing-asmjs-release-closure-2020-03-17/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: 'DOTS/Tiny 20200317', date: '2020-03-17', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
-    { name: "TinyRacing v3 fc wasm", key: 'tinyracingv3fcwasm', url: "demos/fastcomp-tinyracing-wasm-release-2020-03-17/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: 'DOTS/Tiny 20200317', date: '2020-03-17', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
-    { name: "TinyRacing v3 fc asmjs", key: 'tinyracingv3fcasmjs', url: "demos/fastcomp-tinyracing-asmjs-release-2020-03-17/TinyRacing.html", size: 0, heap: 0, compiler: '', engine: 'DOTS/Tiny 20200317', date: '2020-03-17', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
-    { name: "TinyRacing v2 RC", key: 'tinyracingv2rc', url: "demos/TinyRacing-Wasm-Release-2020-01-24/TinyRacing.html", size: 5991715, heap: 128*1024*1024, compiler: '', engine: 'DOTS/Tiny 20200124', date: '2020-01-24', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
-    { name: "TinyRacing v1", key: 'tinyracing', url: "demos/TinyRacing-Wasm-Release-2019-12-12/TinyRacing.html", size: 5309395, heap: 128*1024*1024, compiler: '', engine: 'DOTS/Tiny 20191212', date: '2019-12-12', apis: ['WebGL 1', 'WebAssembly', 'Web Audio'], noVsync: true, interactive: true, mobile: true },
-    { name: "Tanks", key: 'tanks', url: "demos/Tanks_20191004_152744_wasm_release_profiling/index.html", size: 38704043, heap: 128*1024*1024, compiler: '', engine: 'Unity 2020.1.0a8 (git trunk)', date: '2019-10-04', apis: ['wasm', 'linear-color-space', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
-    { name: "Microgame - FPS", key: 'microgame_fps', url: "demos/microgame-fps_20190922_131915_wasm_release_profiling/index.html", size: 56898863, heap: 256*1024*1024, compiler: '', engine: 'Unity 2018.4.5f1', date: '2019-09-22', apis: ['wasm', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
-    { name: "Ruby's Adventure", key: 'rubysadventure', url: "demos/RubysAdventure_20190722_201255_wasm_release_profiling/index.html", size: 34990078, heap: 64*1024*1024, compiler: '', engine: 'Unity 2019.1.10f1', date: '2019-07-22', apis: ['wasm', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
-    { name: "The Explorer", key: 'theexplorer', url: "demos/TheExplorer_20190723_140034_wasm_release_profiling/index.html", size: 172183324, heap: 512*1024*1024, compiler: '', engine: 'Unity 2019.1.10f1', date: '2019-07-23', apis: ['wasm', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
-    { name: "LWRPTemplate", key: 'lwrptemplate', url: "demos/LWRPTemplate_20190919_204458_wasm_release_profiling/index.html", size: 36726171, heap: 128*1024*1024, compiler: '', engine: 'Unity 2019.1.10f1', date: '2019-09-19', apis: ['wasm', 'URP', 'WebGL 2', 'linear-color-space'], noVsync: true, interactive: true, mobile: true },
-    { name: "Microgame - Kart", key: 'microgame_kart', url: "demos/kart-template_20190725_130858_wasm_release_profiling/index.html", size: 37606983, heap: 256*1024*1024, compiler: '', engine: 'Unity 2018.4.4f1', date: '2019-07-25', apis: ['wasm', 'WebGL 1', 'WebGL 2'], noVsync: true, interactive: true, mobile: true },
-    { name: "BoatAttack", key: 'boatattack', url: "demos/BoatAttack_20190722_175007_wasm_release_profiling/index.html", size: 117181002, heap: 512*1024*1024, compiler: '', engine: 'Unity 2019.1.0b2', date: '2019-07-22', apis: ['wasm', 'URP', 'WebGL 2', 'linear-color-space'], noVsync: true, interactive: true, mobile: true },
-    { name: "BoatAttack 2020.2.4", key: 'BoatAttack_2020.2.4', url: "demos/BoatAttack_2020.2.4/index.html", size: 135.9*1024*1024, heap: 387*1024*1024, compiler: '', engine: 'Unity 2020.2.4', date: '2021-03-09', apis: ['wasm', 'URP', 'WebGL 2', 'linear-color-space'], noVsync: true, interactive: true, mobile: true },
-    { name: "BoatAttack 2021.2", key: 'BoatAttack_2021.2', url: "demos/BoatAttack_2021.2/index.html", size: 157.6*1024*1024, heap: 387*1024*1024, compiler: '', engine: 'Unity 2021.2', date: '2021-03-09', apis: ['wasm', 'URP', 'WebGL 2', 'linear-color-space'], noVsync: true, interactive: true, mobile: true },
-    { name: "Microgame - Kart 2020.2.4", key: 'microgame_kart_2020.2.4', url: "demos/com.unity.template.kart_20210304_144749_wasm_release_profiling/index.html", size: 43.6*1024*1024, heap: 166*1024*1024, compiler: '', engine: 'Unity 2020.2.4', date: '2021-03-04', apis: ['wasm', 'WebGL 2', 'WebAudio'], noVsync: true, interactive: true, mobile: true },
-    { name: "Microgame - Kart 2021.2", key: 'microgame_kart_2021.2', url: "demos/com.unity.template.kart_20210305_102729_wasm_release_profiling/index.html", size: 43*1024*1024, heap: 102*1024*1024, compiler: '', engine: 'Unity 2021.2', date: '2021-03-05', apis: ['wasm', 'WebGL 2', 'WebAudio'], noVsync: true, interactive: true, mobile: true },
-    { name: "Dragon Crashers - 2020.3.5f1", key: 'dragon_crashers.2020.3', url: "demos/Dragon Crashers_20210429_121455_wasm_release_profiling/index.html", size: 89.8*1024*1024, heap: 500.3*1024*1024, compiler: '', engine: 'Unity 2020.3', date: '2021-04-29', apis: ['wasm', 'WebGL 2', 'WebAudio'], noVsync: true, interactive: true, mobile: true }
+    { name: "Viking Village WebGPU", key: 'viking_village_wgpu', url: 'demos/viking_village/index.html', size: 478151700, heap: 870776832, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGPU'], noVsync: true, interactive: true, mobile: true},
+    { name: "Boat Attack WebGPU", key: 'boat_attack_wgpu', url: 'demos/boat_attack/index.html', size: 237402974, heap: 432275456, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGPU'], noVsync: true, interactive: true, mobile: true},
+    { name: "Dragon Crashers WebGPU", key: 'dragon_crashers_wgpu', url: 'demos/dragon_crashers/index.html', size: 97759548, heap: 300154880, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGPU'], noVsync: true, interactive: true, mobile: true},
+    { name: "Viking Village", key: 'viking_village_webgl', url: 'demos/viking_village/index.html?webgl', size: 478151700, heap: 904396800, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGL 2'], noVsync: true, interactive: true, mobile: true},
+    { name: "Boat Attack", key: 'boat_attack_webgl', url: 'demos/boat_attack/index.html?webgl', size: 237402974, heap: 482621708, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGL 2'], noVsync: true, interactive: true, mobile: true},
+    { name: "Dragon Crashers", key: 'dragon_crashers_webgl', url: 'demos/dragon_crashers/index.html?webgl', size: 97759548, heap: 295877117, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGL 2'], noVsync: true, interactive: true, mobile: true},
 
+    { name: "Viking Village DEV WebGPU", key: 'viking_village_dev_wgpu', url: 'demos/viking_village_dev/index.html', size: 504671789, heap: 891027456, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGPU'], noVsync: true, interactive: true, mobile: true, notSelectedByDefault: true},
+    { name: "Boat Attack DEV WebGPU", key: 'boat_attack_dev_wgpu', url: 'demos/boat_attack_dev/index.html', size: 274441506, heap: 651711724, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGPU'], noVsync: true, interactive: true, mobile: true, notSelectedByDefault: true},
+    { name: "Dragon Crashers DEV WebGPU", key: 'dragon_crashers_dev_wgpu', url: 'demos/dragon_crashers_dev/index.html', size: 127088763, heap: 300154880, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGPU'], noVsync: true, interactive: true, mobile: true, notSelectedByDefault: true},
+    { name: "Viking Village DEV", key: 'viking_village_dev_webgl', url: 'demos/viking_village_dev/index.html?webgl', size: 504671789, heap: 912195584, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGL 2'], noVsync: true, interactive: true, mobile: true, notSelectedByDefault: true},
+    { name: "Boat Attack DEV", key: 'boat_attack_dev_webgl', url: 'demos/boat_attack_dev/index.html?webgl', size: 274441506, heap: 360185856, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGL 2'], noVsync: true, interactive: true, mobile: true, notSelectedByDefault: true},
+    { name: "Dragon Crashers DEV", key: 'dragon_crashers_dev_webgl', url: 'demos/dragon_crashers_dev/index.html?webgl', size: 127088763, heap: 300154880, compiler: 'Emscripten 3.1.38-unity', engine: 'Unity 2023.2.0a20.3279', date: '2023-06-11', apis: ['WebGL 2'], noVsync: true, interactive: true, mobile: true, notSelectedByDefault: true},
   ];
 
   // If running on a mobile browser, filter out showing the tests that can't be run on a mobile browser.
@@ -123,13 +112,14 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     for(var i = 0; i < selectedTestsAtStart.length; ++i) selectedTestsAtStart[i] = selectedTestsAtStart[i].trim().toLowerCase();
   }
 
-  var demos = '<table><tr><td><b>Name</b></td><td><b>Version</b></td><td><b>Result</b></td><td style="max-width:50px;"><b>Scope</b></td><td><b>Engine</b></td><td><b>Disk Size</b></td><td><b>Heap Size</b></td><td><b>Test</b></td><td><b>Interactive</b></td></tr>'
+  var demos = '<table><tr><td><b>Name</b></td><td><b>Version</b></td><td><b>Result</b></td><td style="max-width:50px;"><b>Scope</b></td><td><b>Engine</b></td><td><b>Disk Size</b></td><td><b>Wasm Heap</b></td><td><b>Test</b></td><td><b>Interactive</b></td></tr>'
   for(var i = 0; i < tests.length; ++i) {
     var t = tests[i];
     t.id = i;
 
     var item = '<tr style="background-color: ' + ((i % 2 == 1) ? '#F0F0F0' : '#D0D0D0') + ' ;">';
     var checked = (selectedTestsAtStart.length == 0 || selectedTestsAtStart.indexOf(t.name.toLowerCase()) != -1 || selectedTestsAtStart.indexOf(t.key.toLowerCase()) != -1) ? 'checked' : '';
+    if (t.notSelectedByDefault) checked = '';
     item += '<td><input type="checkbox" name="' + t.name + '" id="' + t.name + '" ' + checked + ' onclick="countAndUpdateNumTestsSelected();" /><label for="' + t.name + '">' + t.name + '</label></td>';
     item += '<td>' + t.date + '</td>';
     item += '<td id="results_' + t.id + '">Not yet run</td>';
@@ -340,7 +330,8 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         else if (t.result.cpuProfiler) dur += ' (cpuprof)';
         if (t.result.result == 'FAIL') dur += ' (FAILED! diff: ' + t.result.wrongPixels + ')';
         dur = padLengthRight(padLengthLeft(dur, 29), 30);
-        var fps = padLengthRight(padLengthLeft(t.result.fps.toFixed(2), 6), 7);
+        var fps = padLengthRight(padLengthLeft(t.result.fps.toFixed(2), 11), 12);
+        var stableFps = padLengthRight(padLengthLeft(t.result.stableFps.toFixed(2), 11), 12);
         var cpuIdle = padLengthRight(padLengthLeft(t.result.cpuIdle.toFixed(2) + '%', 9), 10);
         if (t.result.webGLCpuTime) {
           var webGLCpuTime = Math.round(t.result.webGLCpuTime) + 'ms (' + (t.result.webGLCpuTime*100.0/t.result.cpuTime).toFixed(2) + '%)';
@@ -355,7 +346,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var pageLoadTime = padLengthRight(padLengthLeft(t.result.pageLoadTime.toFixed(2) + 'ms', 15), 16);
         var numStutterEvents = padLengthRight(padLengthLeft(t.result.numStutterEvents+'', 19), 20);
         var usedJsMemory = padLengthLeft(t.result.usedJsMemory == 0 ? 'N/A' : (t.result.usedJsMemory/1024/1024).toFixed(1)+'MB', 12);
-        return time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + webGLCpuTime + '|' + webGLApiCallCount + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
+        return time + '|' + n + '|' + dur + '|' + fps + '|' + stableFps + '|' + cpuTime + '|' + webGLCpuTime + '|' + webGLApiCallCount + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
       } else {
         return time + '|' + n + '|' + 'ERROR! ' + t.result.error + '\n';
       }
@@ -404,6 +395,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var n = padLengthLeft(padLengthRight(test.name + '-' + test.date + ' (Averaged)', 38), 39);
         var totalTime = get70PercentAverage(function(p) { return p.totalTime; });
         var fps = get70PercentAverage(function(p) { return p.fps; });
+        var stableFps = get70PercentAverage(function(p) { return p.stableFps; });
         var cpuIdle = get70PercentAverage(function(p) { return p.cpuIdle; });
         var cpuTime = get70PercentAverage(function(p) { return p.cpuTime; });
         var webGLCpuTime = get70PercentAverage(function(p) { return p.webGLCpuTime; });
@@ -414,23 +406,26 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
         var usedJsMemory = get70PercentAverage(function(p) { return p.usedJsMemory; });
 
         var dur = padLengthRight(padLengthLeft(Math.round(totalTime) + 'ms', 29), 30);
-        fps = padLengthRight(padLengthLeft(fps.toFixed(2), 6), 7);
+        fps = padLengthRight(padLengthLeft(fps.toFixed(2), 11), 12);
+        stableFps = padLengthRight(padLengthLeft(stableFps.toFixed(2), 11), 12);
         cpuIdle = padLengthRight(padLengthLeft(cpuIdle.toFixed(2) + '%', 9), 10);
         if (webGLCpuTime) {
-          webGLCpuTime = padLengthRight(padLengthLeft(Math.round(webGLCpuTime) + 'ms (' + (webGLCpuTime*100.0/cpuTime).toFixed(2) + '%)', 17), 18);
-          webGLApiCallCount = padLengthRight(padLengthLeft((webGLApiCallCount/numRenderedFrames).toFixed(2), 17), 18);
+          webGLCpuTime = Math.round(webGLCpuTime) + 'ms (' + (webGLCpuTime*100.0/cpuTime).toFixed(2) + '%)';
+          webGLApiCallCount = (webGLApiCallCount/numRenderedFrames).toFixed(2);
         } else {
           webGLCpuTime = '(not tracked)';
           webGLApiCallCount = '(not tracked)';
         }
+        webGLCpuTime = padLengthRight(padLengthLeft(webGLCpuTime, 17), 18);
+        webGLApiCallCount = padLengthRight(padLengthLeft(webGLApiCallCount, 17), 18);
         cpuTime = padLengthRight(padLengthLeft(Math.round(cpuTime) + 'ms', 9), 10);
         pageLoadTime = padLengthRight(padLengthLeft(pageLoadTime.toFixed(2) + 'ms', 15), 16);
         numStutterEvents = padLengthRight(padLengthLeft(numStutterEvents.toFixed(1)+'', 19), 20);
         usedJsMemory = padLengthLeft(usedJsMemory == 0 ? 'N/A' : (usedJsMemory/1024/1024).toFixed(1)+'MB', 12);
-        s += time + '|' + n + '|' + dur + '|' + fps + '|' + cpuTime + '|' + webGLCpuTime + '|' + webGLApiCallCount + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
+        s += time + '|' + n + '|' + dur + '|' + fps + '|' + stableFps + '|' + cpuTime + '|' + webGLCpuTime + '|' + webGLApiCallCount + '|' + cpuIdle + '|' + pageLoadTime + '|' + numStutterEvents + '|' + usedJsMemory + '\n';
       }
     }
-    s += '                  |                                       |                              |       |          |                  |          |                |                    |            \n';
+         '                  |                                       |                              |            |            |          |                  |                  |          |                |                    |            \n';
     s += '</pre>';
     emrun_print(s);
     document.getElementById('full_test_results').innerHTML = s;
@@ -447,7 +442,7 @@ td { padding: 2px; padding-right: 10px; margin: 0px;}
     if (numTestsRun > 0 && allTestsRun && location.search.toLowerCase().indexOf('autorun') != -1) emrun_exit(numTestsFailed);
   }
 
-  var fullTestLog = ' Run Date         | Test Name                             | Total time (lower is better) |   FPS | CPU Time |   WebGL CPU Time | WebGL calls/frame| CPU Idle | Page load time | # of janked frames | Used JS Mem\n';
+  var fullTestLog = ' Run Date         | Test Name                             | Total time (lower is better) |   Avg. FPS | Stable FPS | CPU Time |   WebGL CPU Time | WebGL calls/frame| CPU Idle | Page load time | # of janked frames | Used JS Mem\n';
   fullTestLog += '-'.repeat(fullTestLog.length-1) + '\n';
 
   // Harness received a completion message from a test window.

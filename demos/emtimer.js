@@ -98,6 +98,9 @@ var numStutterEvents = 0;
 // This field tracks how many consecutive frames have run smoothly. This variable is set to -1 when smooth frame rate has been achieved to disable tracking this further.
 var numConsecutiveSmoothFrames = 0;
 
+var bestConsecutiveSmoothFrames = 0;
+var bestSmoothFps = 0;
+
 const numFastFramesNeededForSmoothFrameRate = 120; // Require 120 frames i.e. ~2 seconds of consecutive smooth stutter free frames to conclude we have reached a stable animation rate.
 
 var registeredEventListeners = [];
@@ -649,9 +652,6 @@ function doReferenceTest() {
     var wrong = Infinity;
     var testResult = 'FAIL';
 
-    // Check if we never reached a stable frame rate?
-    if (numConsecutiveSmoothFrames != -1) emunittestReportCustomBlockDuration('timeUntilSmoothFramerate', Infinity);
-
     try {
       var div = document.createElement('div');
 
@@ -731,6 +731,7 @@ function doReferenceTest() {
       cpuTime: accumulatedCpuTime,
       cpuIdle: cpuIdle,
       fps: fps,
+      stableFps: bestSmoothFps,
       pageLoadTime: pageLoadTime,
       numStutterEvents: numStutterEvents,
       usedJsMemory: typeof performance !== 'undefined' && performance.memory ? performance.memory.usedJSHeapSize : 0
@@ -764,6 +765,7 @@ function doReferenceTest() {
                      + '   pageLoadTimeToFrame1: The total time from the beginning of page load until the first application frame rendering is complete (msecs). \n'
                      + '   pageLoadTimeToFrame10: The total time from the beginning of page load until the 10th application frame has completed rendering (msecs). \n'
                      + '   timeUntilSmoothFramerate: How long it took to reach a stable animation frame rate (msecs). A stable animation frame rate is reached when ' + numFastFramesNeededForSmoothFrameRate + ' subsequent frames are rendered without a single stutter event. \n';
+                     + '   smoothFramerate: The average frame rate of the content after all stutter events had passed. \n';
 
     if (document.getElementById('testResults')) document.getElementById('testResults').innerHTML = 'var results = ' + JSON.stringify(testResults, null, '\t') + ';\n' + instructions;
 
@@ -1117,6 +1119,7 @@ var lastFrameDuration = -1;
 var lastFrameTick = -1;
 
 var timeOfFrame1 = -1;
+var timeOfSmoothFrameRateStart = 0;
 
 // If -1, we are not running an event. Otherwise represents the wallclock time of when we exited the last event handler.
 var previousEventHandlerExitedTime = -1;
@@ -1141,23 +1144,29 @@ function referenceTestTick() {
     referenceTestT0 = -1;
   }
 
+  const slowFrameDurationFactor = 1.40; // If a frame takes this much longer than the previous frame, then it is considered to be a stutter frame.
 
   var frameDuration = t1 - lastFrameTick;
   lastFrameTick = t1;
-  if (referenceTestFrameNumber > 5 && lastFrameDuration > 0) {
-    if (frameDuration > 20.0 && frameDuration > lastFrameDuration * 1.35) {
+  if (referenceTestFrameNumber > 0 && lastFrameDuration > 0) {
+    if (frameDuration > lastFrameDuration * slowFrameDurationFactor) {
+      // we have a stuttered frame!
       ++numStutterEvents;
-      if (numConsecutiveSmoothFrames != -1) numConsecutiveSmoothFrames = 0;
+      numConsecutiveSmoothFrames = 0;
+      // reset the time to track the start of this next smooth frame rate time.
+      timeOfSmoothFrameRateStart = t1;
     } else {
-      if (numConsecutiveSmoothFrames != -1) {
-        ++numConsecutiveSmoothFrames;
-        if (numConsecutiveSmoothFrames >= numFastFramesNeededForSmoothFrameRate) {
-          emunittestReportCustomBlockDuration('timeUntilSmoothFramerate', t1 - timeOfFrame1);
-          numConsecutiveSmoothFrames = -1;
-        }
-      }
+      // This was a smooth frame, accumulate the count of total smooth frames.
+      ++numConsecutiveSmoothFrames;
     }
   }
+
+  // Keep tally of the longest stretch of stable FPS period
+  if (numConsecutiveSmoothFrames > bestConsecutiveSmoothFrames) {
+    bestConsecutiveSmoothFrames = numConsecutiveSmoothFrames;
+    bestSmoothFps = numConsecutiveSmoothFrames * 1000.0 / (t1 - timeOfSmoothFrameRateStart);
+  }
+
   lastFrameDuration = frameDuration;
 
   if (numPreloadXHRsInFlight == 0) { // Important! The frame number advances only for those frames that the game is not waiting for data from the initial network downloads.
@@ -1177,7 +1186,7 @@ function referenceTestTick() {
   }
 
   if (referenceTestFrameNumber == 1) {
-    emtimerOptions['timeStart'] = t1;
+    emtimerOptions['timeStart'] = timeOfSmoothFrameRateStart = t1;
     if (injectingInputStream && emtimerOptions['refTest']) loadReferenceImage();
 
     top.postMessage({ msg: 'startGame', key: emtimerOptions.key }, '*');
