@@ -449,6 +449,7 @@ function receiveMessage(event)
   if (browserInfo && browserInfo.nativeSystemInfo && browserInfo.nativeSystemInfo.uuid) testResults.hardwareUuid = browserInfo.nativeSystemInfo.uuid;
   testResults.runOrdinal = allTestResultsByKey[testResults.key] ? (allTestResultsByKey[testResults.key].length + 1) : 1;
   resultsServer_StoreTestResults(testResults);
+  post("^test^" + JSON.stringify(testResults));
 
   // Accumulate results in dictionary.
   if (testResults.result != 'FAIL') {
