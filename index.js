@@ -609,6 +609,7 @@ function onBrowserResultsReceived(results) {
   updateSystemInformation(results);
   writeFullTestResults();
   resultsServer_StoreSystemInfo(results);
+  post("^sys^" + JSON.stringify(results));
   autoRun();
 }
 

@@ -731,6 +731,10 @@ class HTTPHandler(SimpleHTTPRequestHandler):
           logv('Web page has quit with a call to exit() with return code ' + str(page_exit_code) + '. Shutting down web server. Pass --serve_after_exit to keep serving even after the page terminates with exit().')
           self.server.shutdown()
           return
+      elif data.startswith('^sys^'):  # Save system information to file
+        data = str(data[5:])
+        with open("results/sys_info.json", "w") as file:
+          file.write(data)
       else:
         # The user page sent a message with POST. Parse the message and log it to stdout/stderr.
         is_stdout = False
