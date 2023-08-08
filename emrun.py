@@ -733,13 +733,16 @@ class HTTPHandler(SimpleHTTPRequestHandler):
           return
       elif data.startswith('^sys^'):  # Save system information to file
         data = str(data[5:])
-        with open("results/sys_info.json", "w") as file:
+        filename = "results/sys_info.json"
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        with open(filename, "w") as file:
           file.write(data)
       elif data.startswith('^test^'):
         data = str(data[6:])
         data_json = json.loads(data)
-        print(data)
-        with open(f"results/{data_json['runUuid']}_result.json", "w") as file:
+        filename = f"results/{data_json['runUuid']}_result.json"
+        os.makedirs(os.path.dirname(filename), exist_ok=True)
+        with open(filename, "w") as file:
           file.write(data)
       else:
         # The user page sent a message with POST. Parse the message and log it to stdout/stderr.
