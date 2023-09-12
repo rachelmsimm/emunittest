@@ -1,9 +1,6 @@
-from demo import Demo
-
 import json
 
 def add(demo):
-    #demo = Demo("name", "key", "url")
     check_for_duplicates(demo.name, demo.key)
     json_obj = create_entry(demo)
     insert_entry(json_obj)
@@ -12,18 +9,18 @@ def add(demo):
 def get_existing_demos():
     with open("demo_list.json") as json_file:
         data = json.load(json_file)
-        print(data)
         return data
 
-def check_for_duplicates(name, key, demos=get_existing_demos()):
-    # searches for name and key in json file
-    # if found, throw error
-    # else return true
+def check_for_duplicates(name, key):
+    demos = get_existing_demos()
+
+    for demo in demos:
+        if demo["name"] == name or demo["key"] == key:
+            raise Exception("Duplicate name or key")
     return
 
 def create_entry(demo):
     entry = json.dumps(demo.__dict__)
-    print(entry)
     return entry
 
 def insert_entry(json_obj):
