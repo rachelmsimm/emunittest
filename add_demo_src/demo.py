@@ -8,7 +8,7 @@ class Demo:
                  compiler="", 
                  engine="", 
                  date="", 
-                 apis=['wasm', 'URP', 'WebGL 2', 'linear-color-space'], 
+                 apis=["wasm", "URP", "WebGL 2", "linear-color-space"], 
                  noVsync=True, 
                  interactive=True, 
                  mobile=True):
@@ -24,3 +24,6 @@ class Demo:
         self.noVsync = noVsync
         self.interactive = interactive
         self.mobile = mobile
+
+    def create():
+        pass
