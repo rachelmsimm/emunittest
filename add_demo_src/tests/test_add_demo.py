@@ -1,6 +1,7 @@
 from unittest.mock import patch
 from add_demo_src.add_demo import add
 from add_demo_src.demo import Demo
+
 import pytest
 
 mock_demo_list = [
@@ -17,7 +18,7 @@ mock_demo_obj = Demo("game1", "game1", "demos/game1/index.html")
 
 class TestAddDemo:
     def test_add_demo_success(mocker):
-        with patch("add_demo_src.add_demo.insert_entry", return_value=None) as mock_insert_entry:
+        with patch("add_demo_src.add_demo.insert_demo", return_value=None) as mock_insert_entry:
             with patch("add_demo_src.add_demo.get_existing_demos", return_value={}):
                 add(mock_demo_obj)
                 assert(mock_insert_entry.call_count == 1)
