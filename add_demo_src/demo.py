@@ -24,6 +24,3 @@ class Demo:
         self.noVsync = noVsync
         self.interactive = interactive
         self.mobile = mobile
-
-    def create():
-        pass

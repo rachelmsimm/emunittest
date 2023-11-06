@@ -1,0 +1,2 @@
+class DuplicateNameOrKeyException(Exception):
+    pass
