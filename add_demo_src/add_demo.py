@@ -2,10 +2,10 @@ from exceptions import DuplicateNameOrKeyException
 
 import json
 
-def add(demo):
+def add(new_demo):
     try:
-        check_for_duplicates(demo.name, demo.key)
-        insert_demo(demo)
+        check_for_duplicates(new_demo.name, new_demo.key)
+        insert_demo(new_demo)
     except DuplicateNameOrKeyException:
         print(f"Duplicate name or key; names and keys must be unique.")
 
