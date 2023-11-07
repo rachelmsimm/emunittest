@@ -8,7 +8,6 @@ class Demo:
                  compiler="", 
                  engine="", 
                  date="", 
-                 version="",
                  apis=["wasm", "URP", "WebGL 2", "linear-color-space"], 
                  noVsync=True, 
                  interactive=True, 
@@ -21,7 +20,6 @@ class Demo:
         self.compiler = compiler
         self.engine = engine
         self.date = date
-        self.version = version
         self.apis = apis
         self.noVsync = noVsync
         self.interactive = interactive

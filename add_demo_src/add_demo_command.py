@@ -16,7 +16,6 @@ class AddDemoCommand(object):
         parser.add_argument("--compiler", help="The compiler of the demo.", default="")
         parser.add_argument("--engine", help="The engine of the demo.", default="")
         parser.add_argument("--date", help="The date of the demo.", default="")
-        parser.add_argument("--version", help="The version of Unity the demo uses.", default="")
         parser.add_argument("--apis", help="The apis of the demo.", default=["wasm", "URP", "WebGL 2", "linear-color-space"])
         parser.add_argument("--noVsync", help="The noVsync of the demo.", default=True)
         parser.add_argument("--interactive", help="The interactive of the demo.", default=True)
@@ -32,7 +31,6 @@ class AddDemoCommand(object):
                     args.compiler, 
                     args.engine, 
                     args.date, 
-                    args.version,
                     args.apis, 
                     args.noVsync, 
                     args.interactive, 
