@@ -16,7 +16,7 @@ class AddDemoCommand(object):
         parser.add_argument("--date", help="The date the demo was created or added", default="")
         parser.add_argument("--apis", help="The APIs used by the build/demo", default=["wasm", "URP", "WebGL 2", "linear-color-space"])
         parser.add_argument("--noVsync", help="Whether or not no Vsync is used", default=True)
-        parser.add_argument("--interactive", help="Whether or not the demo is interactive (interactive demos have inputstream.js files)", default=True)
+        parser.add_argument("--interactive", help="Whether or not the demo is interactive (can be launched from the Emunittest page)", default=True)
         parser.add_argument("--mobile", help="Whether the demo/build is meant to be run on mobile or not", default=True)
 
         args = parser.parse_args()
