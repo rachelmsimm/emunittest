@@ -28,5 +28,5 @@ class TestAddDemo:
     def test_add_demo_duplicate_name_or_key(mocker):
         with patch("add_demo_src.add_demo.get_existing_demos", return_value=mock_demo_list):
             with pytest.raises(DuplicateNameOrKeyException):
-                check_for_duplicates(mock_demo_obj.name, mock_demo_obj.key)        
+                check_for_duplicates(mock_demo_obj.name, mock_demo_obj.key)
 
