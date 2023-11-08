@@ -8,3 +8,4 @@ add_demo_src/tests/__pycache__
 demos
 results
 demo_list.json
+.DS_Store
