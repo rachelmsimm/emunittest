@@ -3,8 +3,6 @@
 __pycache__
 PUBLIC
 PRIVATE
-add_demo_src/__pycache__
-add_demo_src/tests/__pycache__
 demos
 results
 demo_list.json
