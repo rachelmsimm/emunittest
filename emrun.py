@@ -1768,6 +1768,8 @@ def run():
       if browser_exe == 'cmd':
         url = url.replace('&', '^&')
       url = url.replace('0.0.0.0', 'localhost')
+      if options.browser_url:
+        url = options.browser_url
       browser += browser_args + [url]
 
   if options.kill_start:
@@ -1823,10 +1825,6 @@ def run():
     else:
       browser_stderr_handle = open(options.log_stderr, 'a')
   if options.run_browser:
-    if options.browser_url:
-        url = options.browser_url
-        logv('Connecting browser to URL ' + url)
-        browser += browser_args + [url]
     logv("Starting browser: %s" % ' '.join(browser))
     # if browser[0] == 'cmd':
     #   Workaround an issue where passing 'cmd /C start' is not able to detect
