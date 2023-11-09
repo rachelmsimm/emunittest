@@ -3,8 +3,6 @@ from add_demo_src.add_demo import key_and_name_are_valid
 from add_demo_src.demo import Demo
 from unittest.mock import patch
 
-import pytest
-
 mock_demo_list = [
     {"name": "game1",
      "key": "game1",
