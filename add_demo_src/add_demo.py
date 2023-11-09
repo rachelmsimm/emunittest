@@ -1,13 +1,9 @@
-from exceptions import DuplicateNameOrKeyException
-
 import json
 
 def add(new_demo):
-    try:
-        check_for_duplicates(new_demo.name, new_demo.key)
+    valid_key_and_name = key_and_name_are_valid(new_demo.name, new_demo.key)
+    if (valid_key_and_name):
         insert_demo(new_demo)
-    except DuplicateNameOrKeyException as e:
-        print(f"DuplicateNameOrKeyException: {e.message}")
 
     return
 
@@ -17,15 +13,18 @@ def get_existing_demos():
         
         return data
 
-def check_for_duplicates(name, key):
+def key_and_name_are_valid(name, key):
     demos = get_existing_demos()
-    print(f"demos from file: {demos}")
+    are_valid = True
 
     for demo in demos:
         if demo['name'] == name or demo['key'] == key:
-            raise DuplicateNameOrKeyException
+            print(f"Failed to add demo with name: {name} and key: {key}." +
+                  "The name or key of the demo you are trying to add already exists. Names and keys must be unique.")
+            are_valid = False
+            break
         
-    return
+    return are_valid
 
 def insert_demo(new_demo):
     demos = get_existing_demos()
