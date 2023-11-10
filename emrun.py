@@ -1526,6 +1526,9 @@ def parse_args():
 
   parser.add_argument('--verbose', action='store_true',
                       help='Enable verbose logging from emrun internal operation.')
+  
+  parser.add_argument('--browser_url', default='',
+                      help='Specifies the address the web browser would connect to.')
 
   parser.add_argument('--hostname', default=default_webserver_hostname,
                       help='Specifies the hostname the server runs in.')
@@ -1765,6 +1768,8 @@ def run():
       if browser_exe == 'cmd':
         url = url.replace('&', '^&')
       url = url.replace('0.0.0.0', 'localhost')
+      if options.browser_url:
+        url = options.browser_url
       browser += browser_args + [url]
 
   if options.kill_start:
