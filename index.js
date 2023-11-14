@@ -40,7 +40,8 @@ var browserInfo = null;
 // Aggregates all test results by test name, e.g. allTestResultsByKey['angrybots'] is an array containing results of each run of that demo.
 var allTestResultsByKey = {};
 
-var testData = await fetch(`${window.location.href}/demo_list.json`);
+var host = window.location.protocol + "//" + window.location.host;
+var testData = await fetch(`${host}/demo_list.json`);
 var tests = await testData.json();
 
 // If running on a mobile browser, filter out showing the tests that can't be run on a mobile browser.
