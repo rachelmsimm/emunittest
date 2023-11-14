@@ -40,9 +40,8 @@ var browserInfo = null;
 // Aggregates all test results by test name, e.g. allTestResultsByKey['angrybots'] is an array containing results of each run of that demo.
 var allTestResultsByKey = {};
 
-var tests = [
-  { name: "placeholder_name", key: 'placeholder_key', url: "placeholder_url", size: 157.6*1024*1024, heap: 387*1024*1024, compiler: '', engine: 'Unity 2021.2', date: '2021-03-09', apis: ['wasm', 'URP', 'WebGL 2', 'linear-color-space'], noVsync: true, interactive: true, mobile: true },
-]
+var testData = await fetch(`${window.location.href}/demo_list.json`);
+var tests = await testData.json();
 
 // If running on a mobile browser, filter out showing the tests that can't be run on a mobile browser.
 var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);

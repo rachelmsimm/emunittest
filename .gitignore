@@ -1,5 +1,9 @@
 .benchmarks.done
 .browsers
+__pycache__
 PUBLIC
 PRIVATE
 demos
+results
+demo_list.json
+.DS_Store
