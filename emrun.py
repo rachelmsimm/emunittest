@@ -1677,6 +1677,9 @@ def run():
     # to support binding to port zero we must allow the server to open to socket then retrieve the final port number
     options.port = httpd.socket.getsockname()[1]
 
+  if options.browser_url:
+    url = options.browser_url
+
   if not file_to_serve_is_url:
     if len(options.cmdlineparams):
       url += '?' + '&'.join(options.cmdlineparams)
@@ -1767,9 +1770,8 @@ def run():
       # use ^ to escape them.
       if browser_exe == 'cmd':
         url = url.replace('&', '^&')
-      url = url.replace('0.0.0.0', 'localhost')
-      if options.browser_url:
-        url = options.browser_url
+      if not options.browser_url:
+        url = url.replace('0.0.0.0', 'localhost')
       browser += browser_args + [url]
 
   if options.kill_start:
