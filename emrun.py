@@ -1681,11 +1681,14 @@ def run():
     url = options.browser_url
 
   if not file_to_serve_is_url:
+    
+    if not options.browser_url:
+      hostname = socket.gethostbyname(socket.gethostname()) if options.android else options.hostname
+      # create url for browser after opening the server so we have the final port number in case we are binding to port 0
+      url = 'http://' + hostname + ':' + str(options.port) + '/' + url
+
     if len(options.cmdlineparams):
       url += '?' + '&'.join(options.cmdlineparams)
-    hostname = socket.gethostbyname(socket.gethostname()) if options.android else options.hostname
-    # create url for browser after opening the server so we have the final port number in case we are binding to port 0
-    url = 'http://' + hostname + ':' + str(options.port) + '/' + url
 
   if options.android:
     if options.run_browser or options.browser_info:
