@@ -1677,12 +1677,18 @@ def run():
     # to support binding to port zero we must allow the server to open to socket then retrieve the final port number
     options.port = httpd.socket.getsockname()[1]
 
+  if options.browser_url:
+    url = options.browser_url
+
   if not file_to_serve_is_url:
+    
+    if not options.browser_url:
+      hostname = socket.gethostbyname(socket.gethostname()) if options.android else options.hostname
+      # create url for browser after opening the server so we have the final port number in case we are binding to port 0
+      url = 'http://' + hostname + ':' + str(options.port) + '/' + url
+
     if len(options.cmdlineparams):
       url += '?' + '&'.join(options.cmdlineparams)
-    hostname = socket.gethostbyname(socket.gethostname()) if options.android else options.hostname
-    # create url for browser after opening the server so we have the final port number in case we are binding to port 0
-    url = 'http://' + hostname + ':' + str(options.port) + '/' + url
 
   if options.android:
     if options.run_browser or options.browser_info:
@@ -1767,9 +1773,8 @@ def run():
       # use ^ to escape them.
       if browser_exe == 'cmd':
         url = url.replace('&', '^&')
-      url = url.replace('0.0.0.0', 'localhost')
-      if options.browser_url:
-        url = options.browser_url
+      if not options.browser_url:
+        url = url.replace('0.0.0.0', 'localhost')
       browser += browser_args + [url]
 
   if options.kill_start:
