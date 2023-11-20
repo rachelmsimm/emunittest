@@ -275,8 +275,9 @@ function post(msg) {
   http.open("POST", "stdio.html", true);
   http.send(msg);
 }
-// If the address contains localhost, or we are running the page from port 6931, we can assume we're running the test runner and should post stdout logs.
-if (document.URL.indexOf("localhost") != -1 || document.URL.indexOf(":6931/") != -1) {
+
+// If autoRun is enabled, assume we want to automatically close the browser the test(s) finish
+if (autoRun) {
   var emrun_http_sequence_number = 1;
   emrun_exit = function() { if (emrun_num_post_messages_in_flight == 0) postExit('^exit^'+EXITSTATUS); else emrun_should_close_itself = true; };
   emrun_print = function(text) { post('^out^'+(emrun_http_sequence_number++)+'^'+encodeURIComponent(text)); }
@@ -285,7 +286,7 @@ if (document.URL.indexOf("localhost") != -1 || document.URL.indexOf(":6931/") !=
   // Notify emrun web server that this browser has successfully launched the page.
   post('^pageload^');
 } else {
-  // emrun is not being used, no-op.
+  // otherwise, don't pass any exit/print functions, and the browser stays open
   emrun_exit = function() {}
   emrun_print = function(text) {}
   emrun_printErr = function(text) {}
