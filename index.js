@@ -4,6 +4,8 @@ let {
   emrun_printErr,
 } = window;
 
+const autoRunEnabled = location.search.toLowerCase().indexOf('autorun') != -1;
+
 (function createEventListeners() {
   document.getElementById('show-system-information').addEventListener('click', () => {
     toggleVisible('show-system-information', 'system_information');
@@ -29,7 +31,7 @@ if (location.search.toLowerCase().indexOf('numtimes=') != -1) {
 
 document.getElementById('noVsync').checked = (location.search.toLowerCase().indexOf('novsync') != -1);
 document.getElementById('fakeGL').checked = (location.search.toLowerCase().indexOf('fakeGL') != -1);
-if (location.search.toLowerCase().indexOf('nocpuprofiler') != -1 || location.search.toLowerCase().indexOf('autorun') != -1) {
+if (location.search.toLowerCase().indexOf('nocpuprofiler') != -1 || autoRunEnabled) {
   document.getElementById('cpuProfiler').checked = false;
 }
 document.getElementById('tortureMode').checked = (location.search.toLowerCase().indexOf('torturemode') != -1);
@@ -277,7 +279,7 @@ function post(msg) {
 }
 
 // If autoRun is enabled, assume we want to automatically close the browser the test(s) finish
-if (autoRun) {
+if (autoRunEnabled) {
   var emrun_http_sequence_number = 1;
   emrun_exit = function() { if (emrun_num_post_messages_in_flight == 0) postExit('^exit^'+EXITSTATUS); else emrun_should_close_itself = true; };
   emrun_print = function(text) { post('^out^'+(emrun_http_sequence_number++)+'^'+encodeURIComponent(text)); }
@@ -422,7 +424,7 @@ function writeFullTestResults() {
       if (t.result.result != 'PASS') ++numTestsFailed;
     }
   }
-  if (numTestsRun > 0 && allTestsRun && location.search.toLowerCase().indexOf('autorun') != -1) emrun_exit(numTestsFailed);
+  if (numTestsRun > 0 && allTestsRun && autoRunEnabled) emrun_exit(numTestsFailed);
 }
 
 var fullTestLog = ' Run Date         | Test Name                             | Total time (lower is better) |   FPS | CPU Time |   WebGL CPU Time | WebGL calls/frame| CPU Idle | Page load time | # of janked frames | Used JS Mem\n';
@@ -516,7 +518,7 @@ function toggleVisible(buttionId, id) {
 }
 
 function autoRun() {
-  if (!currentlyRunningTest && location.search.toLowerCase().indexOf('autorun') != -1) {
+  if (!currentlyRunningTest && autoRunEnabled) {
     runSelectedTests();
   }
 }
